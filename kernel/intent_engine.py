@@ -1,22 +1,32 @@
+from kernel.intent_registry import IntentRegistry
+
+
+
 class IntentEngine:
+
+
+    def __init__(self):
+
+        self.registry = IntentRegistry()
+
+        self.load_defaults()
+
+
+
+    def load_defaults(self):
+
+        self.registry.register(
+            [
+                "pdf",
+                "pdfs",
+                "document"
+            ],
+            "filesystem",
+            "list_pdfs"
+        )
+
 
 
     def analyze(self, command):
 
-        command = command.lower()
-
-
-        if "pdf" in command:
-
-            return {
-                "plugin": "filesystem",
-                "action": "list_pdfs",
-                "confidence": 0.95
-            }
-
-
-        return {
-            "plugin": None,
-            "action": None,
-            "confidence": 0.0
-        }
+        return self.registry.find(command)
