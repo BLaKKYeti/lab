@@ -1,6 +1,5 @@
-import importlib
-
 from kernel.plugin_registry import PluginRegistry
+from kernel.plugin_loader import PluginLoader
 
 
 
@@ -11,25 +10,24 @@ class PluginManager:
 
         self.registry = PluginRegistry()
 
-
-
-    def register(self, plugin):
-
-        self.registry.register(plugin)
+        self.loader = PluginLoader()
 
 
 
     def load_builtin_plugins(self):
 
-        filesystem = importlib.import_module(
-            "plugins.filesystem"
-        )
+        plugins = self.loader.discover()
 
 
-        plugin = filesystem.FilesystemPlugin()
+        for plugin in plugins:
+
+            self.register(plugin)
 
 
-        self.register(plugin)
+
+    def register(self, plugin):
+
+        self.registry.register(plugin)
 
 
 
