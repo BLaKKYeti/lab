@@ -1,0 +1,21 @@
+{
+    "editor.formatOnSave": true,
+
+    "editor.codeActionsOnSave": {
+        "source.organizeImports": "always",
+        "source.fixAll": "always"
+    },
+
+    "python.analysis.typeCheckingMode": "basic",
+
+    "python.analysis.autoImportCompletions": true,
+
+    "files.exclude": {
+        "**/__pycache__": true,
+        "**/.pytest_cache": true
+    },
+
+    "git.autofetch": true,
+
+    "terminal.integrated.defaultProfile.windows": "PowerShell"
+}
