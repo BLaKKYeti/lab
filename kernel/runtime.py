@@ -1,7 +1,7 @@
 from registry.registry import Registry
 from resolver.resolver import Resolver
-from connectors.filesystem import FileSystemConnector
 from kernel.config import ConfigLoader
+from kernel.connector_loader import ConnectorLoader
 
 
 class Runtime:
@@ -13,9 +13,12 @@ class Runtime:
 
     def start(self):
 
-        if self.config["connectors"]["filesystem"]["enabled"]:
-            filesystem = FileSystemConnector()
-            self.registry.register(filesystem)
+        loader = ConnectorLoader(
+            self.registry,
+            self.config
+        )
+
+        loader.load()
 
         print(self.config["system"]["name"], "online")
         print("Version:", self.config["system"]["version"])
