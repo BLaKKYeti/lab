@@ -2,9 +2,7 @@ from kernel.plugin_manager import PluginManager
 from kernel.memory import Memory
 
 
-
 class Runtime:
-
 
     def __init__(self):
 
@@ -16,13 +14,25 @@ class Runtime:
 
     def start(self):
 
-        self.plugin_manager.load_builtin_plugins()
+        self.plugin_manager.discover_plugins()
+
 
         print("LAB AI OS online")
+
 
         print(
             "Plugins:",
             self.plugin_manager.list_plugins()
+        )
+
+
+        print(
+            "\nCAPABILITIES:"
+        )
+
+
+        print(
+            self.plugin_manager.get_capabilities()
         )
 
 

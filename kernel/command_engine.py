@@ -1,27 +1,44 @@
-from kernel.intent import IntentAnalyzer
-
-
 class CommandEngine:
 
 
     def __init__(self, runtime):
 
         self.runtime = runtime
-        self.intent = IntentAnalyzer()
 
 
 
     def interpret(self, command):
 
-        task = self.intent.analyze(command)
+        command = command.lower()
 
 
-        if task["plugin"] is None:
 
-            return "I do not understand that command yet."
-
-
-        return self.runtime.execute(
-            task["plugin"],
-            task["action"]
+        capabilities = (
+            self.runtime
+            .plugin_manager
+            .get_capabilities()
         )
+
+
+
+        for plugin, data in capabilities.items():
+
+            for action in data["actions"]:
+
+
+                keywords = action.replace(
+                    "_",
+                    " "
+                )
+
+
+                if keywords in command:
+
+                    return self.runtime.execute(
+                        plugin,
+                        action
+                    )
+
+
+
+        return "No matching capability found."
