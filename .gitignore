@@ -6,11 +6,8 @@ __pycache__/
 venv/
 .venv/
 
-# Environment secrets
-.env
+# VS Code
+.vscode/
 
-# IDE files
-.vscode/.venv/
-__pycache__/
-*.pyc
+# Project runtime data
 memory.json
