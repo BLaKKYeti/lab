@@ -3,11 +3,12 @@
         "ms-python.python",
         "ms-python.vscode-pylance",
         "charliermarsh.ruff",
-        "github.copilot",
         "github.copilot-chat",
         "eamodio.gitlens",
         "usernamehw.errorlens",
         "hediet.vscode-drawio",
-        "yzhang.markdown-all-in-one"
+        "yzhang.markdown-all-in-one",
+        "github.vscode-pull-request-github",
+        "github.vscode-github-actions"
     ]
 }

@@ -12,9 +12,9 @@
             }
         },
         {
-            "label": "Plugin Discovery Test",
+            "label": "Run Tests",
             "type": "shell",
-            "command": "python main.py",
+            "command": "pytest",
             "group": "test",
             "presentation": {
                 "reveal": "always",
@@ -22,10 +22,20 @@
             }
         },
         {
-            "label": "Run Tests",
+            "label": "Lint Code (Ruff)",
             "type": "shell",
-            "command": "pytest",
+            "command": "ruff check .",
             "group": "test",
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            }
+        },
+        {
+            "label": "Format Code (Ruff)",
+            "type": "shell",
+            "command": "ruff format .",
+            "group": "build",
             "presentation": {
                 "reveal": "always",
                 "panel": "shared"
