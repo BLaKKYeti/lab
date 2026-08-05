@@ -22,3 +22,15 @@ class PluginRegistry:
     def list_plugins(self):
 
         return list(self.plugins.keys())
+
+
+
+    def describe(self):
+
+        return {
+            name: {
+                "description": plugin.description(),
+                "actions": plugin.actions()
+            }
+            for name, plugin in self.plugins.items()
+        }
