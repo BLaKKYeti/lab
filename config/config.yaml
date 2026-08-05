@@ -5,3 +5,7 @@ system:
 connectors:
   filesystem:
     enabled: true
+
+claude:
+  enabled: true
+  model: claude-sonnet-4-20250514
