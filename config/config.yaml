@@ -1,0 +1,7 @@
+system:
+  name: LAB AI OS
+  version: 0.1
+
+connectors:
+  filesystem:
+    enabled: true
