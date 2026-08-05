@@ -1,13 +1,23 @@
 import importlib
 
+from kernel.plugin_registry import PluginRegistry
+
+
 
 class PluginManager:
 
-    def __init__(self):
-        self.plugins = {}
 
-    def register(self, name, plugin):
-        self.plugins[name] = plugin
+    def __init__(self):
+
+        self.registry = PluginRegistry()
+
+
+
+    def register(self, plugin):
+
+        self.registry.register(plugin)
+
+
 
     def load_builtin_plugins(self):
 
@@ -15,12 +25,20 @@ class PluginManager:
             "plugins.filesystem"
         )
 
+
         plugin = filesystem.FilesystemPlugin()
 
-        self.register(
-            "filesystem",
-            plugin
-        )
+
+        self.register(plugin)
+
+
+
+    def get(self, name):
+
+        return self.registry.get(name)
+
+
 
     def list_plugins(self):
-        return list(self.plugins.keys())
+
+        return self.registry.list_plugins()

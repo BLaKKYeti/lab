@@ -1,7 +1,8 @@
 {
     "system": {
         "last_plugin": "filesystem",
-        "last_action": "list_pdfs"
+        "last_action": "list_pdfs",
+        "last_result": []
     },
     "history": [
         {

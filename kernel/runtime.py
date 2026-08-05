@@ -2,12 +2,16 @@ from kernel.plugin_manager import PluginManager
 from kernel.memory import Memory
 
 
+
 class Runtime:
+
 
     def __init__(self):
 
         self.plugin_manager = PluginManager()
+
         self.memory = Memory()
+
 
 
     def start(self):
@@ -22,13 +26,16 @@ class Runtime:
         )
 
 
+
     def execute(self, plugin_name, action):
 
-        plugin = self.plugin_manager.plugins.get(plugin_name)
+        plugin = self.plugin_manager.get(plugin_name)
+
 
         if plugin is None:
 
             return f"Plugin '{plugin_name}' not found"
+
 
 
         try:
@@ -48,14 +55,14 @@ class Runtime:
             )
 
 
-            self.memory.remember_event(
-                plugin_name,
-                action,
+            self.memory.remember(
+                "last_result",
                 result
             )
 
 
             return result
+
 
 
         except ValueError as e:
