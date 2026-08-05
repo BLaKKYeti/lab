@@ -18,3 +18,7 @@ result = assistant.interpret(
 
 print("RESULT:")
 print(result)
+
+
+print("\nMEMORY:")
+print(os.memory.all())
