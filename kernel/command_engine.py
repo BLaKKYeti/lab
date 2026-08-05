@@ -1,5 +1,4 @@
-from kernel.intent_engine import IntentEngine
-
+from kernel.intent import IntentAnalyzer
 
 
 class CommandEngine:
@@ -8,21 +7,21 @@ class CommandEngine:
     def __init__(self, runtime):
 
         self.runtime = runtime
-        self.intent_engine = IntentEngine()
+        self.intent = IntentAnalyzer()
 
 
 
     def interpret(self, command):
 
-        intent = self.intent_engine.analyze(command)
+        task = self.intent.analyze(command)
 
 
-        if intent is None:
+        if task["plugin"] is None:
 
             return "I do not understand that command yet."
 
 
         return self.runtime.execute(
-            intent["plugin"],
-            intent["action"]
+            task["plugin"],
+            task["action"]
         )
