@@ -7,9 +7,7 @@ class Runtime:
     def __init__(self):
 
         self.plugin_manager = PluginManager()
-
         self.memory = Memory()
-
 
 
     def start(self):
@@ -24,11 +22,9 @@ class Runtime:
         )
 
 
-
     def execute(self, plugin_name, action):
 
         plugin = self.plugin_manager.plugins.get(plugin_name)
-
 
         if plugin is None:
 
@@ -52,8 +48,9 @@ class Runtime:
             )
 
 
-            self.memory.remember(
-                "last_result",
+            self.memory.remember_event(
+                plugin_name,
+                action,
                 result
             )
 

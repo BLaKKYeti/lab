@@ -8,7 +8,10 @@ class Memory:
 
         self.memory_file = Path("memory.json")
 
-        self.data = {}
+        self.data = {
+            "system": {},
+            "history": []
+        }
 
         self.load()
 
@@ -23,7 +26,7 @@ class Memory:
 
         else:
 
-            self.data = {}
+            self.save()
 
 
 
@@ -41,7 +44,21 @@ class Memory:
 
     def remember(self, key, value):
 
-        self.data[key] = value
+        self.data["system"][key] = value
+
+        self.save()
+
+
+
+    def remember_event(self, plugin, action, result):
+
+        event = {
+            "plugin": plugin,
+            "action": action,
+            "result": result
+        }
+
+        self.data["history"].append(event)
 
         self.save()
 
@@ -49,7 +66,7 @@ class Memory:
 
     def recall(self, key):
 
-        return self.data.get(key)
+        return self.data["system"].get(key)
 
 
 

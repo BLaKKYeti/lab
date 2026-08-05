@@ -1,3 +1,6 @@
+from kernel.tasks import TASKS
+
+
 class CommandEngine:
 
     def __init__(self, runtime):
@@ -9,12 +12,16 @@ class CommandEngine:
         command = command.lower()
 
 
-        if "pdf" in command or "pdfs" in command:
+        for name, task in TASKS.items():
 
-            return self.runtime.execute(
-                "filesystem",
-                "list_pdfs"
-            )
+            keywords = name.split()
+
+            if all(word in command for word in keywords):
+
+                return self.runtime.execute(
+                    task["plugin"],
+                    task["action"]
+                )
 
 
         return "I do not understand that command yet."

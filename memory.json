@@ -1,5 +1,13 @@
 {
-    "last_plugin": "filesystem",
-    "last_action": "list_pdfs",
-    "last_result": []
+    "system": {
+        "last_plugin": "filesystem",
+        "last_action": "list_pdfs"
+    },
+    "history": [
+        {
+            "plugin": "filesystem",
+            "action": "list_pdfs",
+            "result": []
+        }
+    ]
 }
