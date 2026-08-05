@@ -10,4 +10,7 @@ venv/
 .env
 
 # IDE files
-.vscode/
+.vscode/.venv/
+__pycache__/
+*.pyc
+memory.json
