@@ -8,6 +8,12 @@ os = Runtime()
 os.start()
 
 
+print("\nCAPABILITIES:")
+print(
+    os.plugin_manager.get_capabilities()
+)
+
+
 assistant = CommandEngine(os)
 
 
@@ -16,7 +22,7 @@ result = assistant.interpret(
 )
 
 
-print("RESULT:")
+print("\nRESULT:")
 print(result)
 
 
