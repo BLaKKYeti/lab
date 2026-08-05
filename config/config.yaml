@@ -2,10 +2,6 @@ system:
   name: LAB AI OS
   version: 0.1
 
-connectors:
+plugins:
   filesystem:
     enabled: true
-
-claude:
-  enabled: true
-  model: claude-sonnet-4-20250514

@@ -1,20 +1,15 @@
 from kernel.runtime import Runtime
 
 
-def main():
+os = Runtime()
 
-    system = Runtime()
+os.start()
 
-    system.start()
+result = os.execute(
+    "filesystem",
+    "list_pdfs"
+)
 
-    result = system.execute(
-        "filesystem",
-        "list_pdfs"
-    )
-
-    print("PDF Results:")
-    print(result)
-
-
-if __name__ == "__main__":
-    main()
+print("\nPDF Results:")
+for pdf in result:
+    print(pdf)

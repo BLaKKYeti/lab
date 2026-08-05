@@ -1,28 +1,30 @@
-from registry.registry import Registry
-from resolver.resolver import Resolver
-from kernel.config import ConfigLoader
-from kernel.connector_loader import ConnectorLoader
+from kernel.plugin_manager import PluginManager
 
 
 class Runtime:
 
     def __init__(self):
-        self.config = ConfigLoader().load()
-        self.registry = Registry()
-        self.resolver = Resolver(self.registry)
+        self.plugin_manager = PluginManager()
 
     def start(self):
 
-        loader = ConnectorLoader(
-            self.registry,
-            self.config
+        self.plugin_manager.load_builtin_plugins()
+
+        print("LAB AI OS online")
+        print(
+            "Plugins:",
+            self.plugin_manager.list_plugins()
         )
 
-        loader.load()
+    def execute(self, plugin_name, action):
 
-        print(self.config["system"]["name"], "online")
-        print("Version:", self.config["system"]["version"])
-        print("Connectors:", self.registry.list_connectors())
+        plugin = self.plugin_manager.plugins.get(plugin_name)
 
-    def execute(self, connector, task):
-        return self.resolver.resolve(connector, task)
+        if plugin is None:
+            return f"Plugin '{plugin_name}' not found"
+
+        try:
+            return plugin.execute(action)
+
+        except ValueError as e:
+            return str(e)
