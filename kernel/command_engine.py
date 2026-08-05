@@ -1,27 +1,28 @@
-from kernel.tasks import TASKS
+from kernel.intent_engine import IntentEngine
+
 
 
 class CommandEngine:
 
+
     def __init__(self, runtime):
+
         self.runtime = runtime
+        self.intent_engine = IntentEngine()
+
 
 
     def interpret(self, command):
 
-        command = command.lower()
+        intent = self.intent_engine.analyze(command)
 
 
-        for name, task in TASKS.items():
+        if intent is None:
 
-            keywords = name.split()
-
-            if all(word in command for word in keywords):
-
-                return self.runtime.execute(
-                    task["plugin"],
-                    task["action"]
-                )
+            return "I do not understand that command yet."
 
 
-        return "I do not understand that command yet."
+        return self.runtime.execute(
+            intent["plugin"],
+            intent["action"]
+        )

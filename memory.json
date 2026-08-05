@@ -8,6 +8,16 @@
             "plugin": "filesystem",
             "action": "list_pdfs",
             "result": []
+        },
+        {
+            "plugin": "filesystem",
+            "action": "list_pdfs",
+            "result": []
+        },
+        {
+            "plugin": "filesystem",
+            "action": "list_pdfs",
+            "result": []
         }
     ]
 }
