@@ -65,6 +65,19 @@ Rules:
 - Do not override existing decisions
 
 ---
+## Cursor - Repository Implementation Engineer
+
+Responsibilities:
+
+- code navigation
+- implementation
+- testing
+- refactoring
+
+Rules:
+- follow architecture
+- do not redesign systems
+- defer architecture conflicts
 
 ## Human Owner
 
