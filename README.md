@@ -1,4 +1,6 @@
-# LAB AI OS
+# AXIS Formerly LAB AI OS.
+
+AXIS is a personal AI operating system designed for autonomous assistance, memory, reasoning, and extensible capabilities.
 
 LAB AI OS is an experimental operating system for autonomous AI agents. It combines memory, reasoning, planning, workflow orchestration, secure tool execution, connector integrations, and multi-agent collaboration into a single, extensible platform. The goal is to provide a reliable runtime and developer environment so teams and researchers can build, coordinate, and scale intelligent agents safely and productively.
 

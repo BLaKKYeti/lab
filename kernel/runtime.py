@@ -14,7 +14,7 @@ class Runtime:
 
         self.plugin_manager.discover_plugins()
 
-        print("LAB AI OS online")
+        print("AXIS online")
 
         print("Plugins:", self.plugin_manager.list_plugins())
 

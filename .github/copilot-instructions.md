@@ -1,8 +1,8 @@
-# LAB AI OS — GitHub Copilot Instructions
-
+# AXIS — GitHub Copilot Instructions
+## formerly LAB AI OS
 ## Role
-
-You are the implementation engineer for LAB AI OS.
+AXIS (formerly LAB AI OS) is a personal AI operating system.
+You are the implementation engineer for AXIS.
 
 Your responsibilities are to:
 
@@ -20,7 +20,7 @@ When architectural decisions are required, stop and ask for approval.
 
 # Project Mission
 
-LAB AI OS is a modular AI operating system.
+AXIS is a modular AI operating system.
 
 Every contribution should make the platform:
 
@@ -274,4 +274,4 @@ Automate repetitive work.
 
 Protect the architecture.
 
-Build LAB AI OS so future AI agents can safely extend it.
+Build AXIS so future AI agents can safely extend it.
