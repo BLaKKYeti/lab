@@ -38,6 +38,10 @@ User
 
 ↓
 
+Intent Engine
+
+↓
+
 Command Engine
 
 ↓

@@ -1,0 +1,37 @@
+# AXIS Current Execution Pipeline
+
+The current implemented execution pipeline is:
+
+User
+↓
+Intent Engine
+↓
+Command Engine
+↓
+Planner
+↓
+Runtime
+↓
+Plugin Manager
+↓
+Plugin
+↓
+Response
+
+Do not reorder these layers without an approved architecture decision.
+
+# Architecture Evolution
+
+AXIS contains two architectural views:
+
+1. Current implementation architecture
+- what exists today
+- must be preserved
+
+2. Future operating system architecture
+- long-term vision
+- guides future design
+
+Do not implement future architecture prematurely.
+
+Prefer incremental evolution.
