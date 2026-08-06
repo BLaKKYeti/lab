@@ -12,9 +12,29 @@
             }
         },
         {
+            "label": "Plugin Discovery Test",
+            "type": "shell",
+            "command": "python main.py",
+            "group": "test",
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            }
+        },
+        {
             "label": "Run Tests",
             "type": "shell",
             "command": "pytest",
+            "group": "test",
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            }
+        },
+        {
+            "label": "Memory Layer Test",
+            "type": "shell",
+            "command": "pytest tests/test_memory.py",
             "group": "test",
             "presentation": {
                 "reveal": "always",
@@ -36,6 +56,16 @@
             "type": "shell",
             "command": "ruff format .",
             "group": "build",
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            }
+        },
+        {
+            "label": "Full System Check",
+            "type": "shell",
+            "command": "ruff check . && pytest && git status",
+            "group": "test",
             "presentation": {
                 "reveal": "always",
                 "panel": "shared"
