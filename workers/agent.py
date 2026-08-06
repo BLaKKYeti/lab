@@ -11,14 +11,23 @@ class Agent:
             runtime=runtime, intent_engine=self.intent_engine
         )
 
-    def run(self, task):
+    def process(self, user_input):
+        if isinstance(user_input, Task):
+            task = user_input
+        elif isinstance(user_input, str):
+            resolved_intent = self.intent_engine.resolve(user_input)
+            task = self.command_engine.route(resolved_intent)
+        else:
+            return "I don't know how to perform that task yet"
 
-        if isinstance(task, Task):
-            return self.runtime.execute(task)
+        if getattr(task, "plugin", None) is None:
+            return "I couldn't determine a suitable action."
 
-        if isinstance(task, str):
-            resolved_intent = self.intent_engine.resolve(task)
-            routed_task = self.command_engine.route(resolved_intent)
-            return self.runtime.execute(routed_task)
+        result = self.runtime.handle_task(task)
+        return self.format_response(task, result)
 
-        return "I don't know how to perform that task yet"
+    def run(self, user_input):
+        return self.process(user_input)
+
+    def format_response(self, task, result):
+        return f"Result: {result}"

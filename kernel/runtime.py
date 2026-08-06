@@ -22,6 +22,9 @@ class Runtime:
 
         print(self.plugin_manager.get_capabilities())
 
+    def handle_task(self, task):
+        return self.execute(task)
+
     def execute(self, task):
 
         if isinstance(task, Task):
