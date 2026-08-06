@@ -18,5 +18,12 @@
     "files.exclude": {
         "**/__pycache__": true,
         "**/.pytest_cache": true
-    }
+    },
+    "python-envs.pythonProjects": [
+        {
+            "path": ".",
+            "envManager": "ms-python.python:venv",
+            "packageManager": "ms-python.python:pip"
+        }
+    ]
 }
