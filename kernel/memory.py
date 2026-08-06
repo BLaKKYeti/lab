@@ -23,8 +23,32 @@ class Memory:
             with open(self.memory_file, "r") as file:
                 self.data = json.load(file)
 
+            self.migrate()
+
         else:
             self.save()
+
+    def migrate(self):
+
+        if "profile" not in self.data:
+            self.data["profile"] = {}
+
+        if "preferences" not in self.data:
+            self.data["preferences"] = {}
+
+        if "conversations" not in self.data:
+            self.data["conversations"] = []
+
+        if "events" not in self.data:
+            if "history" in self.data:
+                self.data["events"] = self.data.pop("history")
+            else:
+                self.data["events"] = []
+
+        if "system" not in self.data:
+            self.data["system"] = {}
+
+        self.save()
 
     def save(self):
 
@@ -51,9 +75,9 @@ class Memory:
 
         self.save()
 
-    def remember_conversation(self, role, content):
+    def remember_conversation(self, user, response):
 
-        conversation = {"role": role, "content": content}
+        conversation = {"user": user, "response": response}
 
         self.data["conversations"].append(conversation)
 

@@ -10,7 +10,18 @@ class IntentEngine:
 
     def load_defaults(self):
 
+        # Filesystem intents
         self.registry.register(["pdf", "pdfs", "document"], "filesystem", "list_pdfs")
+
+        # Time intents
+        self.registry.register(
+            ["time", "clock", "current time", "what time"], "time", "current_time"
+        )
+
+        # Date intents
+        self.registry.register(
+            ["date", "today", "current date", "what day"], "time", "current_date"
+        )
 
     def resolve(self, command):
 

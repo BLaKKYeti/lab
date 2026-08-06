@@ -4,7 +4,6 @@ from kernel.runtime import Runtime
 
 runtime = Runtime()
 
-
 runtime.start()
 
 
@@ -13,16 +12,25 @@ print(runtime.plugin_manager.get_capabilities())
 
 
 intent_engine = IntentEngine()
+
 command_engine = CommandEngine(runtime=runtime, intent_engine=intent_engine)
 
-resolved_intent = intent_engine.resolve("Find all PDFs on my computer")
-routed_task = command_engine.route(resolved_intent)
-result = runtime.execute(routed_task)
+
+while True:
+    user_input = input("\nUSER: ")
+
+    if user_input.lower() in ["exit", "quit"]:
+        break
+
+    resolved_intent = intent_engine.resolve(user_input)
+
+    routed_task = command_engine.route(resolved_intent)
+
+    result = runtime.execute(routed_task)
+
+    print("\nJARVIS:")
+
+    print(result)
 
 
-print("\nRESULT:")
-print(result)
-
-
-print("\nMEMORY:")
-print(runtime.memory.all())
+print("\nMemory saved.")
