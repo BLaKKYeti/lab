@@ -1,1 +1,1 @@
-from .plugin import FilesystemPlugin
+from .plugin import FilesystemPlugin as FilesystemPlugin

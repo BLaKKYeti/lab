@@ -1,12 +1,5 @@
 class Task:
-
-    def __init__(
-        self,
-        intent,
-        plugin,
-        action,
-        confidence=1.0
-    ):
+    def __init__(self, intent="unknown", plugin=None, action=None, confidence=1.0):
         self.intent = intent
         self.plugin = plugin
         self.action = action

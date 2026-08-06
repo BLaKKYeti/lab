@@ -1,27 +1,13 @@
-from core.task import Task
+from kernel.command_engine import CommandEngine
+from kernel.intent_engine import IntentEngine
 
 
 class CommandProcessor:
-
     def __init__(self):
-        pass
+        self.intent_engine = IntentEngine()
+        self.command_engine = CommandEngine(
+            runtime=None, intent_engine=self.intent_engine
+        )
 
     def interpret(self, command: str):
-
-        command = command.lower()
-
-        if "pdf" in command and "find" in command:
-
-            return Task(
-                intent="search_documents",
-                plugin="filesystem",
-                action="list_pdfs",
-                confidence=0.95
-            )
-
-        return Task(
-            intent="unknown",
-            plugin=None,
-            action=None,
-            confidence=0.0
-        )
+        return self.command_engine.interpret(command)

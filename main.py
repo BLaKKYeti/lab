@@ -1,25 +1,23 @@
-from kernel.runtime import Runtime
 from kernel.command_engine import CommandEngine
+from kernel.intent_engine import IntentEngine
+from kernel.runtime import Runtime
+
+runtime = Runtime()
 
 
-os = Runtime()
-
-
-os.start()
+runtime.start()
 
 
 print("\nCAPABILITIES:")
-print(
-    os.plugin_manager.get_capabilities()
-)
+print(runtime.plugin_manager.get_capabilities())
 
 
-assistant = CommandEngine(os)
+intent_engine = IntentEngine()
+command_engine = CommandEngine(runtime=runtime, intent_engine=intent_engine)
 
-
-result = assistant.interpret(
-    "Find all PDFs on my computer"
-)
+resolved_intent = intent_engine.resolve("Find all PDFs on my computer")
+routed_task = command_engine.route(resolved_intent)
+result = runtime.execute(routed_task)
 
 
 print("\nRESULT:")
@@ -27,4 +25,4 @@ print(result)
 
 
 print("\nMEMORY:")
-print(os.memory.all())
+print(runtime.memory.all())

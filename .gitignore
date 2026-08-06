@@ -1,7 +1,8 @@
 # Python cache
 __pycache__/
 *.pyc
-
+memory.json
+.pytest_cache/
 # Virtual environments
 venv/
 .venv/

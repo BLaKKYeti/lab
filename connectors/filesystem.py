@@ -4,7 +4,6 @@ from interfaces.connector import Connector
 
 
 class FileSystemConnector(Connector):
-
     def name(self):
         return "filesystem"
 
@@ -14,7 +13,7 @@ class FileSystemConnector(Connector):
 
             pdfs = []
 
-            for root, _, files in os.walk(documents):
+            for _root, _, files in os.walk(documents):
                 for file in files:
                     if file.lower().endswith(".pdf"):
                         pdfs.append(file)
@@ -22,4 +21,3 @@ class FileSystemConnector(Connector):
             return pdfs
 
         return "Unknown filesystem task"
-    
