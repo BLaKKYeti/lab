@@ -90,3 +90,19 @@ class Memory:
     def all(self):
 
         return self.data
+
+    def get_conversations(self, limit: int = 10):
+
+        conversations = self.data.get("conversations", [])
+        if limit is None:
+            return conversations
+
+        return conversations[-limit:] if limit > 0 else []
+
+    def get_events(self, limit: int = 10):
+
+        events = self.data.get("events", [])
+        if limit is None:
+            return events
+
+        return events[-limit:] if limit > 0 else []
