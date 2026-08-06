@@ -28,6 +28,8 @@ while True:
 
     result = runtime.execute(routed_task)
 
+    runtime.memory.remember_conversation(user_input, result)
+
     print("\nJARVIS:")
 
     print(result)
