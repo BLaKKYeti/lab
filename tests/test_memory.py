@@ -133,3 +133,79 @@ def test_events_can_be_retrieved_with_limit(tmp_path):
     assert len(recent_events) == 2
     assert recent_events[0]["action"] == "current_date"
     assert recent_events[1]["action"] == "list_files"
+
+
+def test_search_and_recent_return_metadata_enriched_records(tmp_path):
+    memory_file = tmp_path / "memory.json"
+    memory_file.write_text(
+        json.dumps(
+            {
+                "profile": {},
+                "preferences": {},
+                "conversations": [],
+                "events": [],
+                "system": {},
+            }
+        )
+    )
+
+    instance = memory.Memory()
+    instance.memory_file = memory_file
+    instance.data = {
+        "profile": {},
+        "preferences": {},
+        "conversations": [],
+        "events": [],
+        "system": {},
+    }
+    instance.load()
+
+    instance.remember_profile("name", "Ada")
+    instance.remember_preference("theme", "dark")
+    instance.remember_conversation("hello", "hi there")
+    instance.remember_event("filesystem", "list_files", ["notes.txt"])
+
+    search_results = instance.search("dark")
+    assert len(search_results) == 1
+    assert search_results[0]["type"] == "preference"
+    assert search_results[0]["key"] == "theme"
+    assert search_results[0]["value"] == "dark"
+    assert search_results[0]["metadata"]["id"]
+
+    recent_results = instance.recent(limit=3)
+    assert len(recent_results) == 3
+    assert recent_results[0]["type"] in {"preference", "conversation", "event"}
+
+
+def test_profile_and_preferences_remain_backward_compatible(tmp_path):
+    memory_file = tmp_path / "memory.json"
+    memory_file.write_text(
+        json.dumps(
+            {
+                "profile": {},
+                "preferences": {},
+                "conversations": [],
+                "events": [],
+                "system": {},
+            }
+        )
+    )
+
+    instance = memory.Memory()
+    instance.memory_file = memory_file
+    instance.data = {
+        "profile": {},
+        "preferences": {},
+        "conversations": [],
+        "events": [],
+        "system": {},
+    }
+    instance.load()
+
+    instance.remember_profile("name", "Grace")
+    instance.remember_preference("theme", "light")
+
+    assert instance.get_profile()["name"] == "Grace"
+    assert instance.get_preferences()["theme"] == "light"
+    assert instance.all()["profile"]["name"] == "Grace"
+    assert instance.all()["preferences"]["theme"] == "light"
