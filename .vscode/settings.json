@@ -1,21 +1,22 @@
 {
+    "workbench.colorTheme": "GitHub Dark Dimmed",
+    "github-authentication.useElectronFetch": false,
+    "security.workspace.trust.untrustedFiles": "open",
+    "chat.byokUtilityModelDefault": "mainAgent",
+    "python.analysis.typeCheckingMode": "basic",
+    "github.copilot.chat.claudeAgent.allowAutoPermissions": true,
+    "github.copilot.chat.claudeAgent.useSdkExtension": true,
+    "github.copilot.chat.codesearch.enabled": true,
     "editor.formatOnSave": true,
-
     "editor.codeActionsOnSave": {
         "source.organizeImports": "always",
         "source.fixAll": "always"
     },
-
-    "python.analysis.typeCheckingMode": "basic",
-
-    "python.analysis.autoImportCompletions": true,
-
+    "ruff.organizeImports": true,
+    "git.autofetch": true,
+    "terminal.integrated.defaultProfile.windows": "PowerShell",
     "files.exclude": {
         "**/__pycache__": true,
         "**/.pytest_cache": true
-    },
-
-    "git.autofetch": true,
-
-    "terminal.integrated.defaultProfile.windows": "PowerShell"
+    }
 }
