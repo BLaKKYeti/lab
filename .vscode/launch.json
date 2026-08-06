@@ -10,10 +10,34 @@
             "justMyCode": true
         },
         {
-            "name": "LAB AI OS - Current File",
+            "name": "LAB AI OS - Command Engine",
             "type": "python",
             "request": "launch",
-            "program": "${file}",
+            "program": "${workspaceFolder}/kernel/command_engine.py",
+            "console": "integratedTerminal",
+            "justMyCode": true
+        },
+        {
+            "name": "LAB AI OS - Plugin Manager",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/kernel/plugin_manager.py",
+            "console": "integratedTerminal",
+            "justMyCode": true
+        },
+        {
+            "name": "LAB AI OS - Memory Layer",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/kernel/memory.py",
+            "console": "integratedTerminal",
+            "justMyCode": true
+        },
+        {
+            "name": "LAB AI OS - Runtime",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/kernel/runtime.py",
             "console": "integratedTerminal",
             "justMyCode": true
         },
@@ -22,6 +46,14 @@
             "type": "python",
             "request": "launch",
             "module": "pytest",
+            "console": "integratedTerminal",
+            "justMyCode": true
+        },
+        {
+            "name": "Python - Current File",
+            "type": "python",
+            "request": "launch",
+            "program": "${file}",
             "console": "integratedTerminal",
             "justMyCode": true
         }
