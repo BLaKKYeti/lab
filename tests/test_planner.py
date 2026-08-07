@@ -1,20 +1,16 @@
-from kernel.planner import Planner
+from planner.planner import Planner
 
 
-def test_planner_creation():
+def test_pdf_search_plan():
+
     planner = Planner()
-    assert planner is not None
 
+    intent = {"plugin": "filesystem", "action": "list_pdfs"}
 
-def test_plan_returns_a_list():
-    planner = Planner()
-    plan = planner.plan("what time is it")
+    plan = planner.create_plan(intent)
 
-    assert isinstance(plan, list)
+    assert len(plan.steps) == 1
 
+    assert plan.steps[0].plugin == "filesystem"
 
-def test_single_step_plan_is_created_correctly():
-    planner = Planner()
-    plan = planner.plan("what time is it")
-
-    assert plan == [{"step": 1, "description": "what time is it"}]
+    assert plan.steps[0].action == "list_pdfs"

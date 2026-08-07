@@ -11,7 +11,11 @@ class IntentEngine:
     def load_defaults(self):
 
         # Filesystem intents
-        self.registry.register(["pdf", "pdfs", "document"], "filesystem", "list_pdfs")
+        self.registry.register(
+            ["pdf", "pdfs", "document", "documents", "file", "files"],
+            "filesystem",
+            "list_pdfs",
+        )
 
         # Time intents
         self.registry.register(

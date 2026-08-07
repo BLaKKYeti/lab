@@ -1,17 +1,16 @@
 from kernel.command_engine import CommandEngine
 from kernel.intent_engine import IntentEngine
 from kernel.runtime import Runtime
+from planner.planner import Planner
 
 runtime = Runtime()
 
 runtime.start()
 
 
-print("\nCAPABILITIES:")
-print(runtime.plugin_manager.get_capabilities())
-
-
 intent_engine = IntentEngine()
+
+planner = Planner()
 
 command_engine = CommandEngine(runtime=runtime, intent_engine=intent_engine)
 
@@ -24,13 +23,19 @@ while True:
 
     resolved_intent = intent_engine.resolve(user_input)
 
-    routed_task = command_engine.route(resolved_intent)
+    execution_plan = planner.create_plan(resolved_intent)
 
-    result = runtime.execute(routed_task)
+    tasks = command_engine.execute_plan(execution_plan)
+
+    if not tasks:
+        result = "No plan created"
+
+    else:
+        result = runtime.execute(tasks[0])
 
     runtime.memory.remember_conversation(user_input, result)
 
-    print("\nJARVIS:")
+    print("\nAXIS:")
 
     print(result)
 

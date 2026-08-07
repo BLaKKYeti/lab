@@ -29,3 +29,12 @@ class CommandEngine:
         resolved_intent = self.intent_engine.resolve(command)
 
         return self.route(resolved_intent)
+
+    def execute_plan(self, plan):
+
+        tasks = []
+
+        for step in plan.steps:
+            tasks.append(Task(intent="planned", plugin=step.plugin, action=step.action))
+
+        return tasks
