@@ -1,0 +1,221 @@
+{
+    "system": {
+        "last_plugin": "time",
+        "last_action": "current_time",
+        "last_result": "21:43:55"
+    },
+    "profile": {},
+    "preferences": {},
+    "conversations": [
+        {
+            "user": "what time is it?",
+            "response": "23:54:19",
+            "metadata": {
+                "id": "2026-08-06T00:00:00-23",
+                "timestamp": "2026-08-06T00:00:00",
+                "type": "conversation",
+                "source": "migration",
+                "tags": [
+                    "conversation"
+                ]
+            }
+        },
+        {
+            "user": "what time is it?",
+            "response": "23:57:29",
+            "metadata": {
+                "id": "2026-08-06T00:00:00-23",
+                "timestamp": "2026-08-06T00:00:00",
+                "type": "conversation",
+                "source": "migration",
+                "tags": [
+                    "conversation"
+                ]
+            }
+        },
+        {
+            "user": "whats the date",
+            "response": "2026-08-05",
+            "metadata": {
+                "id": "2026-08-06T00:00:00-23",
+                "timestamp": "2026-08-06T00:00:00",
+                "type": "conversation",
+                "source": "migration",
+                "tags": [
+                    "conversation"
+                ]
+            }
+        },
+        {
+            "user": "how many pdfs",
+            "response": [],
+            "metadata": {
+                "id": "2026-08-06T00:00:00-23",
+                "timestamp": "2026-08-06T00:00:00",
+                "type": "conversation",
+                "source": "migration",
+                "tags": [
+                    "conversation"
+                ]
+            }
+        },
+        {
+            "user": "what time is it?",
+            "response": "01:06:20",
+            "metadata": {
+                "id": "2026-08-06T00:00:00-23",
+                "timestamp": "2026-08-06T00:00:00",
+                "type": "conversation",
+                "source": "migration",
+                "tags": [
+                    "conversation"
+                ]
+            }
+        },
+        {
+            "user": "what time is it",
+            "response": "05:42:49",
+            "metadata": {
+                "id": "2026-08-06T00:00:00-24",
+                "timestamp": "2026-08-06T00:00:00",
+                "type": "conversation",
+                "source": "runtime",
+                "tags": [
+                    "conversation"
+                ]
+            }
+        },
+        {
+            "user": "what day is tomorrow",
+            "response": "2026-08-06",
+            "metadata": {
+                "id": "2026-08-06T00:00:00-26",
+                "timestamp": "2026-08-06T00:00:00",
+                "type": "conversation",
+                "source": "runtime",
+                "tags": [
+                    "conversation"
+                ]
+            }
+        },
+        {
+            "user": "what time is it?",
+            "response": "20:27:45",
+            "metadata": {
+                "id": "2026-08-06T00:00:00-28",
+                "timestamp": "2026-08-06T00:00:00",
+                "type": "conversation",
+                "source": "runtime",
+                "tags": [
+                    "conversation"
+                ]
+            }
+        },
+        {
+            "user": "find all my pdfs",
+            "response": [],
+            "metadata": {
+                "id": "2026-08-06T00:00:00-30",
+                "timestamp": "2026-08-06T00:00:00",
+                "type": "conversation",
+                "source": "runtime",
+                "tags": [
+                    "conversation"
+                ]
+            }
+        },
+        {
+            "user": "check c drive",
+            "response": "No plan created",
+            "metadata": {
+                "id": "2026-08-06T00:00:00-31",
+                "timestamp": "2026-08-06T00:00:00",
+                "type": "conversation",
+                "source": "runtime",
+                "tags": [
+                    "conversation"
+                ]
+            }
+        },
+        {
+            "user": "what time is it?",
+            "response": "21:13:49",
+            "metadata": {
+                "id": "2026-08-06T00:00:00-33",
+                "timestamp": "2026-08-06T00:00:00",
+                "type": "conversation",
+                "source": "runtime",
+                "tags": [
+                    "conversation"
+                ]
+            }
+        },
+        {
+            "user": "what day is today?",
+            "response": "2026-08-06",
+            "metadata": {
+                "id": "2026-08-06T00:00:00-35",
+                "timestamp": "2026-08-06T00:00:00",
+                "type": "conversation",
+                "source": "runtime",
+                "tags": [
+                    "conversation"
+                ]
+            }
+        },
+        {
+            "user": "find all my pdfs?",
+            "response": [],
+            "metadata": {
+                "id": "2026-08-06T00:00:00-37",
+                "timestamp": "2026-08-06T00:00:00",
+                "type": "conversation",
+                "source": "runtime",
+                "tags": [
+                    "conversation"
+                ]
+            }
+        },
+        {
+            "user": "exit ",
+            "response": "No plan created",
+            "metadata": {
+                "id": "2026-08-06T00:00:00-38",
+                "timestamp": "2026-08-06T00:00:00",
+                "type": "conversation",
+                "source": "runtime",
+                "tags": [
+                    "conversation"
+                ]
+            }
+        },
+        {
+            "user": "what time is it",
+            "response": "21:18:14",
+            "metadata": {
+                "id": "2026-08-06T00:00:00-40",
+                "timestamp": "2026-08-06T00:00:00",
+                "type": "conversation",
+                "source": "runtime",
+                "tags": [
+                    "conversation"
+                ]
+            }
+        },
+        {
+            "user": "what day is today ?",
+            "response": "2026-08-06",
+            "metadata": {
+                "id": "2026-08-06T00:00:00-42",
+                "timestamp": "2026-08-06T00:00:00",
+                "type": "conversation",
+                "source": "runtime",
+                "tags": [
+                    "conversation"
+                ]
+            }
+        },
+        {
+            "user": "whats the time?",
+            "response": [
+                

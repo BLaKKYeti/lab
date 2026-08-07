@@ -1,3 +1,4 @@
+from execution.executor import Executor
 from kernel.command_engine import CommandEngine
 from kernel.intent_engine import IntentEngine
 from kernel.runtime import Runtime
@@ -12,6 +13,8 @@ class Agent:
         self.planner = Planner()
         self.command_engine = CommandEngine()
 
+        self.executor = Executor(self.runtime)
+
     def start(self):
 
         self.runtime.start()
@@ -22,12 +25,12 @@ class Agent:
 
         plan = self.planner.create_plan(intent)
 
-        tasks = self.command_engine.execute_plan(plan)
-
-        if not tasks:
+        if not plan.steps:
             return "No plan created"
 
-        return self.runtime.execute(tasks[0])
+        results = self.executor.execute_plan(plan)
+
+        return results
 
     def run(self):
 
@@ -41,9 +44,28 @@ class Agent:
 
             result = self.process(user_input)
 
-            self.runtime.memory.remember_conversation(user_input, result)
+            memory_result = result
+
+            if isinstance(result, list):
+                memory_result = [
+                    {
+                        "plugin": item.plugin,
+                        "action": item.action,
+                        "success": item.success,
+                        "output": item.output,
+                    }
+                    for item in result
+                ]
+
+            self.runtime.memory.remember_conversation(user_input, memory_result)
 
             print("\nAXIS:")
-            print(result)
+
+            if isinstance(result, list):
+                for item in result:
+                    print(item.output)
+
+            else:
+                print(result)
 
         print("\nMemory saved.")
