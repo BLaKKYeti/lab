@@ -1,16 +1,18 @@
-def test_command_engine_import():
-    from kernel.command_engine import CommandEngine
+from kernel.command_engine import CommandEngine
+from planner.execution_plan import ExecutionPlan
+from planner.step import Step
 
-    assert CommandEngine is not None
 
+def test_command_engine_converts_plan_to_tasks():
 
-def test_command_engine_builds_task_from_intent():
-    from kernel.command_engine import CommandEngine
-    from kernel.intent_engine import IntentEngine
+    engine = CommandEngine()
 
-    engine = CommandEngine(runtime=None, intent_engine=IntentEngine())
-    task = engine.interpret("Find all PDFs on my computer")
+    plan = ExecutionPlan()
 
-    assert task.plugin == "filesystem"
-    assert task.action == "list_pdfs"
-    assert task.confidence >= 0.95
+    plan.add_step(Step(plugin="time", action="current_time"))
+
+    tasks = engine.execute_plan(plan)
+
+    assert len(tasks) == 1
+    assert tasks[0].plugin == "time"
+    assert tasks[0].action == "current_time"
