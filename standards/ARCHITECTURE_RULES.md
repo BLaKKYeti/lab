@@ -1,136 +1,149 @@
-# LAB AI OS – Architecture Rules
+# AXIS — Architecture Rules
 
-## Purpose
+## Status
 
-Define the permanent architecture boundaries of LAB AI OS.
+**Binding current-state architecture rules.**
 
----
+These rules define ownership and boundaries for the architecture that exists today. Future systems may extend AXIS, but they must not be presented as implemented until their code and tests exist.
 
-# System Architecture
-
-The official flow:
+## Canonical Execution Flow
 
 User
-
 ↓
-
+Agent
+↓
 Intent Engine
-
 ↓
-
-Command Engine
-
-↓
-
 Planner
-
 ↓
-
+Executor
+↓
 Runtime
-
 ↓
-
 Plugin Manager
-
 ↓
-
 Plugin
-
 ↓
+Result / Response
 
-Response
+Memory is accessed through Runtime. Command Engine is implemented but is currently a supporting execution/task-conversion subsystem rather than a required stage in Agent.process().
 
----
+## Ownership Rules
 
-# Kernel Rules
+### Agent
 
-The Kernel is responsible for:
+Owns application-level coordination and the interactive loop.
 
-- System coordination
-- Execution control
-- Plugin management
-- Communication flow
+Must not:
 
-The Kernel must NOT contain:
+- implement plugin-specific behavior
+- bypass Runtime for capability execution
+- become a second execution engine
 
-- Plugin-specific logic
-- Business logic
-- User-specific behavior
+### Intent Engine
 
----
+Owns intent resolution.
 
-# Runtime Rules
+Must not:
 
-Runtime is the central execution layer.
+- execute plugins
+- own execution policy
+- contain capability implementations
 
-Runtime must:
+### Planner
 
-- Receive approved tasks.
-- Validate execution requests.
-- Coordinate plugins.
-- Return results.
+Owns conversion of structured intent into an execution plan.
 
-Runtime must never:
+Must not:
 
-- Directly implement plugin functionality.
-- Contain hardcoded feature logic.
+- execute plugins
+- directly perform side effects
 
----
+### Executor
 
-# Command Engine Rules
+Owns traversal/execution of an `ExecutionPlan`.
 
-Command Engine converts user intent into executable tasks.
+Must:
 
-It must:
+- delegate capability execution to Runtime
+- preserve structured execution results
 
-- Understand commands.
-- Route requests.
-- Create structured tasks.
+Must not:
 
-It must not:
+- implement plugin-specific behavior
+- create an alternate path around Runtime
 
-- Execute plugins directly.
-- Bypass Runtime.
+### Command Engine
 
----
+Owns command/task conversion for execution plans.
 
-# Plugin Rules
+Must not:
+
+- directly execute plugins
+- bypass Runtime
+- become a duplicate of Executor
+
+### Runtime
+
+Owns the central execution boundary.
+
+Must:
+
+- coordinate plugin execution
+- coordinate plugin management
+- provide controlled access to persistent memory
+- return structured results
+
+Must not:
+
+- contain plugin-specific business logic
+- become a general-purpose application layer
+
+### Plugin Manager
+
+Owns plugin registration and resolution/coordination for Runtime.
+
+Plugins must remain isolated from one another and from direct user interaction.
+
+### Plugins
+
+Own capability-specific behavior.
 
 Plugins must be:
 
-- Independent.
-- Replaceable.
-- Self-contained.
+- independent
+- replaceable
+- self-contained
 
 Plugins must not:
 
-- Call other plugins directly.
-- Modify Kernel behavior.
-- Depend on specific implementations.
+- call other plugins directly
+- modify orchestration behavior
+- create alternate execution paths
 
----
+### Memory
 
-# Intelligence Layer
+Owns persistence and retrieval of AXIS state and history.
 
-Future intelligence systems may include:
+Memory implementation details may evolve, but callers must use its defined interfaces rather than duplicating storage logic.
 
-- Planner
-- Memory
-- Reasoner
-- Scheduler
-- Agent Manager
+## Change Management
 
-These systems extend the OS but do not replace Kernel responsibilities.
+Before changing an architectural boundary:
 
----
+1. Inspect the current implementation.
+2. Check tests and compatibility.
+3. Identify all affected documentation.
+4. Document the intended decision.
+5. Implement the smallest coherent change.
+6. Run affected tests.
+7. Synchronize canonical documentation.
 
-# Change Management
+## Non-Negotiable Rules
 
-Before changing architecture:
-
-1. Review existing design.
-2. Check compatibility.
-3. Document decisions.
-4. Test affected systems.
-
-Avoid unnecessary rewrites.
+- Do not bypass Runtime.
+- Do not create duplicate execution systems.
+- Do not put plugin-specific business logic into orchestration components.
+- Do not silently change architectural ownership.
+- Do not document future architecture as current implementation.
+- Preserve backward compatibility unless an approved architecture change explicitly replaces it.
