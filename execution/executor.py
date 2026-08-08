@@ -14,6 +14,7 @@ class Executor:
                 intent="planned",
                 plugin=step.plugin,
                 action=step.action,
+                input=step.input,
             )
 
             result = self.runtime.execute(task)
