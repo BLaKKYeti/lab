@@ -1,166 +1,120 @@
-# LAB AI OS — Project Context
+# AXIS — Project Context
+
+## Status
+
+AXIS is an active software project. This document describes the current project state and mission.
 
 ## Vision
 
-LAB AI OS is a modular artificial intelligence operating system designed to understand requests, plan actions, execute capabilities through plugins, and continuously evolve without losing architectural integrity.
+AXIS is a personal AI operating system designed to understand requests, plan actions, execute capabilities through modular plugins, persist useful memory, and grow without sacrificing architectural integrity.
 
-The platform is built to support autonomous AI development while remaining maintainable, testable, and extensible.
+The current implementation is a Python foundation for that larger vision. Future capabilities must be introduced as explicit, tested architecture changes rather than assumed to already exist.
 
----
+## Current Mission
 
-# Mission
-
-Create an AI operating system that can:
+Build a reliable AI orchestration foundation that can:
 
 - Understand user intent.
-- Plan intelligent actions.
-- Execute capabilities through modular plugins.
-- Learn through memory.
-- Grow without requiring architectural rewrites.
+- Turn intent into structured plans.
+- Execute plans through a controlled Runtime boundary.
+- Expose capabilities through independent plugins.
+- Persist and retrieve useful memory.
+- Support AI-assisted development without losing architectural continuity.
 
----
-
-# Core Architecture
+## Canonical Current Architecture
 
 User
-
 ↓
-
+Agent
+↓
 Intent Engine
-
 ↓
-
-Command Engine
-
-↓
-
 Planner
-
 ↓
-
+Executor
+↓
 Runtime
-
 ↓
-
 Plugin Manager
-
 ↓
-
 Plugin
-
 ↓
+Result / Response
 
-Response
+Memory is a persistent subsystem accessed through Runtime. Command Engine exists and is tested, but is not currently part of Agent.process()'s primary execution path.
 
-Each layer has a single responsibility.
+The authoritative current-state architecture is `docs/ARCHITECTURE_MAP.md`.
 
-Business logic belongs in plugins.
+## Current Implementation Status
 
-Kernel components coordinate execution.
+Implemented and tested foundations include:
 
----
-
-# Current Milestones
-
-Completed:
-
-- Runtime
-- Plugin Loader
-- Plugin Registry
-- Plugin Manager
-- Intent Registry
+- Agent layer
 - Intent Engine
+- Planner and execution-plan structures
 - Command Engine
-- Memory Layer
-- VS Code Development Environment
-- Git Workflow
-- Ruff Integration
-- Pytest Testing Foundation
-- AI Development Standards
-- Copilot Instruction System
-- AI Prompt Library
+- Executor
+- Runtime
+- Plugin Manager
+- Plugin architecture
+- Persistent memory layer
+- Memory recovery behavior
+- Logger foundation
+- Configuration foundation
+- Pytest testing foundation
+- AI development instructions and standards
 
-In Progress:
+The exact implementation state is determined by the code and tests, not by older roadmap language.
 
-- AI-assisted development workflow
-- Time Intelligence
+## Current Development Priorities
 
-Future:
+1. Keep documentation and AI instructions synchronized with the implementation.
+2. Strengthen architecture boundaries and contracts.
+3. Expand execution capabilities through plugins.
+4. Integrate model providers and local model support through explicit adapters.
+5. Build toward richer orchestration, memory use, voice control, and autonomous workflows only after their architecture is defined and tested.
 
-- Planner
-- Multi-plugin orchestration
-- Long-term memory
-- LLM abstraction layer
-- Web connector
-- Local model support
-- Voice interface
-- Autonomous task execution
+## AI Development Workflow
 
----
+AI coding agents are implementation tools, not the final authority on architecture.
 
-# AI Responsibilities
+Before making changes:
 
-## ChatGPT
+1. Read the canonical project and architecture documents.
+2. Inspect the relevant implementation and tests.
+3. Identify the owning component.
+4. Explain architecture impact.
+5. Make the smallest coherent change.
 
-System architect.
+After making changes:
 
-Responsible for:
+- run the relevant tests
+- report files changed
+- report architecture impact
+- report test results
+- keep documentation synchronized when behavior changes
 
-- architecture
-- planning
-- technical decisions
-- debugging strategy
+## Engineering Principles
 
----
-
-## GitHub Copilot
-
-Implementation engineer.
-
-Responsible for:
-
-- coding
-- refactoring
-- testing
-- boilerplate
-- documentation updates
-
----
-
-## Claude
-
-Senior reviewer.
-
-Responsible for:
-
-- architecture review
-- documentation review
-- alternative implementation analysis
-- risk identification
-
----
-
-# Engineering Principles
-
-Always prefer:
+Prefer:
 
 - simplicity
 - modularity
+- explicit ownership
+- testability
 - maintainability
-- extensibility
-- automation
+- backward compatibility
+- small, reviewable changes
 
 Avoid:
 
-- duplication
+- duplicate systems
 - hidden dependencies
-- unnecessary complexity
-- architectural shortcuts
+- bypassing Runtime
+- business logic in orchestration layers
+- describing future systems as current functionality
+- unnecessary rewrites
 
----
+## Definition of Success
 
-# Definition of Success
-
-LAB AI OS should eventually be capable of extending itself safely through AI-assisted development while preserving its architecture and quality standards.
-
-Every contribution should move the project closer to that goal.
+AXIS should evolve into a capable personal AI operating system while remaining understandable, testable, auditable, and extensible. Every implementation change should strengthen that foundation rather than merely increase the amount of code.
