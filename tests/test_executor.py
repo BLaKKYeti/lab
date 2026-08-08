@@ -65,3 +65,45 @@ def test_executor_reports_failure_for_runtime_error():
     assert len(results) == 1
     assert results[0].success is False
     assert results[0].output == "Plugin 'time' not found"
+
+
+def test_executor_executes_multiple_steps_in_order():
+    runtime = FakeRuntime("success")
+    executor = Executor(runtime)
+
+    plan = type(
+        "Plan",
+        (),
+        {
+            "steps": [
+                type(
+                    "Step",
+                    (),
+                    {
+                        "plugin": "filesystem",
+                        "action": "list_pdfs",
+                    },
+                )(),
+                type(
+                    "Step",
+                    (),
+                    {
+                        "plugin": "time",
+                        "action": "current_time",
+                    },
+                )(),
+            ]
+        },
+    )()
+
+    results = executor.execute_plan(plan)
+
+    assert len(results) == 2
+
+    assert results[0].plugin == "filesystem"
+    assert results[0].action == "list_pdfs"
+    assert results[0].success is True
+
+    assert results[1].plugin == "time"
+    assert results[1].action == "current_time"
+    assert results[1].success is True
