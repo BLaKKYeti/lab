@@ -35,3 +35,15 @@ def test_task_can_carry_input():
     )
 
     assert task.input == {"path": "C:\\Users"}
+
+
+def test_step_can_carry_input():
+    from planner.step import Step
+
+    step = Step(
+        plugin="filesystem",
+        action="list_pdfs",
+        input={"path": "C:\\Users"},
+    )
+
+    assert step.input == {"path": "C:\\Users"}
