@@ -1,3 +1,4 @@
+from core.task import Task
 from execution.executor import Executor
 
 
@@ -107,3 +108,40 @@ def test_executor_executes_multiple_steps_in_order():
     assert results[1].plugin == "time"
     assert results[1].action == "current_time"
     assert results[1].success is True
+
+
+def test_executor_passes_task_to_runtime():
+    class InspectingRuntime:
+        def __init__(self):
+            self.received = None
+
+        def execute(self, task):
+            self.received = task
+            return "12:34"
+
+    runtime = InspectingRuntime()
+    executor = Executor(runtime)
+
+    plan = type(
+        "Plan",
+        (),
+        {
+            "steps": [
+                type(
+                    "Step",
+                    (),
+                    {
+                        "plugin": "time",
+                        "action": "current_time",
+                    },
+                )()
+            ]
+        },
+    )()
+
+    results = executor.execute_plan(plan)
+
+    assert len(results) == 1
+    assert isinstance(runtime.received, Task)
+    assert runtime.received.plugin == "time"
+    assert runtime.received.action == "current_time"

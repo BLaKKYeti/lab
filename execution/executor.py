@@ -1,3 +1,4 @@
+from core.task import Task
 from execution.result import ExecutionResult
 
 
@@ -6,13 +7,16 @@ class Executor:
         self.runtime = runtime
 
     def execute_plan(self, plan):
-
         results = []
 
         for step in plan.steps:
-            result = self.runtime.execute(
-                {"plugin": step.plugin, "action": step.action}
+            task = Task(
+                intent="planned",
+                plugin=step.plugin,
+                action=step.action,
             )
+
+            result = self.runtime.execute(task)
 
             results.append(
                 ExecutionResult(
