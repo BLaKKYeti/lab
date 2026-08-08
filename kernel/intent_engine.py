@@ -3,13 +3,10 @@ from kernel.intent_registry import IntentRegistry
 
 class IntentEngine:
     def __init__(self):
-
         self.registry = IntentRegistry()
-
         self.load_defaults()
 
     def load_defaults(self):
-
         # Filesystem intents
         self.registry.register(
             ["pdf", "pdfs", "document", "documents", "file", "files"],
@@ -19,18 +16,54 @@ class IntentEngine:
 
         # Time intents
         self.registry.register(
-            ["time", "clock", "current time", "what time"], "time", "current_time"
+            ["time", "clock", "current time", "what time"],
+            "time",
+            "current_time",
         )
 
         # Date intents
         self.registry.register(
-            ["date", "today", "current date", "what day"], "time", "current_date"
+            ["date", "today", "current date", "what day"],
+            "time",
+            "current_date",
         )
 
     def resolve(self, command):
+        command = command.lower()
 
-        return self.registry.find(command)
+        matched_steps = []
+
+        for intent in self.registry.intents:
+            for keyword in intent["keywords"]:
+                if keyword in command:
+                    step = {
+                        "plugin": intent["plugin"],
+                        "action": intent["action"],
+                    }
+
+                    if step not in matched_steps:
+                        matched_steps.append(step)
+
+                    break
+
+        if len(matched_steps) > 1:
+            return {
+                "steps": matched_steps,
+                "confidence": 0.95,
+            }
+
+        if len(matched_steps) == 1:
+            return {
+                "plugin": matched_steps[0]["plugin"],
+                "action": matched_steps[0]["action"],
+                "confidence": 0.95,
+            }
+
+        return {
+            "plugin": None,
+            "action": None,
+            "confidence": 0.0,
+        }
 
     def analyze(self, command):
-
         return self.resolve(command)
