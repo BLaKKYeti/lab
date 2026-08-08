@@ -16,3 +16,7 @@ venv/
 
 # Project runtime data
 memory.json
+
+# Runtime logs
+logs/
+*.log
