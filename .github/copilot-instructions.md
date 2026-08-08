@@ -1,281 +1,145 @@
 # AXIS — GitHub Copilot Instructions
-## formerly LAB AI OS
+
 ## Role
-AXIS (formerly LAB AI OS) is a personal AI operating system.
-You are the implementation engineer for AXIS.
 
-Your responsibilities are to:
+AXIS is a personal AI operating system. The current repository is a tested Python foundation for that larger vision.
 
-- Implement approved features.
-- Preserve architecture.
-- Minimize unnecessary code changes.
-- Produce production-quality code.
-- Reduce the developer's workload.
+You are an implementation engineer. Your responsibilities are to:
 
-You are an implementation engineer.
-
-You may identify architectural issues and recommend improvements.
+- implement approved features
+- preserve architecture
+- minimize unnecessary code changes
+- produce production-quality code
+- reduce developer workload
 
 Do not make architectural changes without approval.
 
-When architectural decisions are required, stop and ask for approval.
+## Canonical References
 
----
+Before changing code, review:
 
-# Project Mission
+- `PROJECT_CONTEXT.md`
+- `docs/ARCHITECTURE_MAP.md`
+- `standards/ARCHITECTURE_RULES.md`
+- `standards/AI_CONSTITUTION.md`
+- `standards/CODING_STANDARDS.md`
+- `standards/PLUGIN_SPEC.md`
+- `DEVELOPMENT.md`
 
-AXIS is a modular AI operating system.
+`docs/ARCHITECTURE.md` is target/future architecture documentation and must not be used to claim that unimplemented systems exist.
 
-Every contribution should make the platform:
-
-- More modular
-- More maintainable
-- More testable
-- Easier for AI agents to extend
-
-Prefer extending existing systems over creating new ones.
-
----
-
-# Required References
-
-Before changing code, always review:
-
-- standards/AI_CONSTITUTION.md
-- standards/ARCHITECTURE_RULES.md
-- standards/CODING_STANDARDS.md
-- standards/PLUGIN_SPEC.md
-- DEVELOPMENT.md
-
-These documents define project standards.
-
----
-
-# Required Workflow
-
-For every implementation:
-
-## 1. Inspect
-
-Understand the existing implementation before editing.
-
-Identify:
-
-- affected files
-- dependencies
-- plugin interactions
-- architecture impact
-
-Never assume.
-
----
-
-## 2. Plan
-
-Before writing code, explain:
-
-- what will change
-- why
-- risks
-- expected result
-
-Keep plans concise.
-
----
-
-## 3. Implement
-
-When modifying code:
-
-- preserve compatibility
-- avoid duplicate systems
-- use existing abstractions
-- avoid unnecessary rewrites
-
-Prefer small focused commits.
-
----
-
-## 4. Test
-
-After implementation always run:
-
-python -m pytest
-
-If Ruff is configured:
-
-ruff check .
-
-If formatting is configured:
-
-ruff format .
-
-Do not claim code works unless tests pass.
-
----
-
-## 5. Review
-
-Before finishing, verify:
-
-- architecture preserved
-- imports clean
-- no duplicate logic
-- no dead code
-- documentation updated if required
-
----
-
-# Architecture
-
-Always follow:
+## Current Architecture
 
 User
-
 ↓
-
+Agent
+↓
 Intent Engine
-
 ↓
-
-Command Engine
-
-↓
-
 Planner
-
 ↓
-
+Executor
+↓
 Runtime
-
 ↓
-
 Plugin Manager
-
 ↓
-
 Plugin
-
 ↓
+Result / Response
 
-Response
+Memory is accessed through Runtime. Command Engine is implemented and tested as a supporting plan-to-task conversion subsystem, but is not currently a required stage in `Agent.process()`.
 
-Never bypass Runtime.
+## Architecture Rules
 
-Never let plugins call one another directly.
+- Runtime owns capability execution.
+- Planner owns plan creation.
+- Executor owns plan traversal.
+- Memory owns persistence and retrieval.
+- Plugin Manager owns plugin registration and resolution.
+- Plugins expose isolated capabilities.
+- Agent coordinates application flow.
+- Do not bypass Runtime.
+- Do not create duplicate execution paths.
+- Plugins must not call one another directly.
+- Do not place plugin-specific business logic in orchestration components.
+- Do not silently change ownership boundaries.
 
-Never place business logic inside Kernel.
+## Required Workflow
 
-Kernel coordinates.
+### 1. Inspect
 
-Plugins perform work.
+Understand the existing implementation and tests before editing. Identify affected files, dependencies, plugin interactions, and architecture impact.
 
----
+### 2. Plan
 
-# Plugin Rules
+State what will change, why, risks, expected result, and architecture impact. Keep the change focused.
 
-Plugins must remain independent.
+### 3. Implement
 
-Every plugin should expose:
+Preserve compatibility, reuse existing abstractions, avoid duplicate systems, and prefer small focused commits.
 
-- capabilities()
-- execute(...)
-- health()
+### 4. Test
 
-Plugins should never depend on another plugin.
+Run:
 
----
+```powershell
+python -m pytest
+```
 
-# Coding Standards
+If configured, also run:
 
-Always:
+```powershell
+ruff check .
+ruff format .
+```
 
-- use Python type hints
-- keep functions small
+Do not claim code works unless the relevant tests pass.
+
+### 5. Review
+
+Verify architecture is preserved, imports are clean, duplicate logic is absent, dead code is avoided, and documentation is updated when behavior changes.
+
+## Coding Standards
+
+- use Python type hints where appropriate
+- keep functions focused
 - write readable code
-- preserve backwards compatibility
-- prefer composition over duplication
+- preserve backwards compatibility unless explicitly approved otherwise
+- prefer composition and existing abstractions
 - add tests for new functionality
+- avoid circular imports, hidden side effects, and unnecessary abstractions
 
-Avoid:
+## Git Rules
 
-- circular imports
-- global state
-- large monolithic functions
-- hidden side effects
-- unnecessary abstractions
+- do not modify unrelated systems in one change
+- do not commit generated runtime files or secrets
+- keep commits focused
+- commit messages should explain what changed and why
 
----
+## Agent Behavior
 
-# Git Rules
+When a request is ambiguous, ask before changing architecture. When multiple solutions exist, recommend the simplest maintainable option. Reuse existing systems when they already solve the problem.
 
-Never modify multiple unrelated systems in one change.
+## Response Format
 
-Never commit generated files.
+When completing a task, report:
 
-Never commit secrets.
-
-Keep commits focused.
-
-Commit messages should explain:
-
-- what changed
-- why
-
----
-
-# Agent Behaviour
-
-When a request is ambiguous:
-
-Ask before changing architecture.
-
-When multiple solutions exist:
-
-Recommend the simplest maintainable option.
-
-When existing code already solves the problem:
-
-Reuse it.
-
-Never rewrite working systems without approval.
-
----
-
-# Response Format
-
-When completing a task, provide:
-
-## Summary
-
+### Summary
 What changed.
 
-## Files Modified
+### Files Modified
+Every file changed.
 
-List every file changed.
+### Architecture Impact
+Whether an architecture boundary changed.
 
-## Tests
+### Tests
+Commands executed and results.
 
-List commands executed.
+### Result
+State test, lint, and formatting status accurately.
 
-## Result
+## Primary Objective
 
-State whether:
-
-- tests passed
-- lint passed
-- formatting passed
-
-If something could not be completed, explain why.
-
----
-
-# Primary Objective
-
-Minimize developer effort.
-
-Automate repetitive work.
-
-Protect the architecture.
-
-Build AXIS so future AI agents can safely extend it.
+Minimize developer effort while protecting AXIS architecture and keeping the implementation understandable, testable, auditable, and extensible.
