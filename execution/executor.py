@@ -16,7 +16,14 @@ class Executor:
 
             results.append(
                 ExecutionResult(
-                    plugin=step.plugin, action=step.action, success=True, output=result
+                    plugin=step.plugin,
+                    action=step.action,
+                    success=not (
+                        isinstance(result, str)
+                        and result.startswith("Plugin '")
+                        and result.endswith("not found")
+                    ),
+                    output=result,
                 )
             )
 
