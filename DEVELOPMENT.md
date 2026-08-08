@@ -1,42 +1,52 @@
-# LAB AI OS Development Guide
+# AXIS Development Guide
 
 ## Mission
 
-LAB AI OS is a modular operating system framework designed to understand tasks, plan actions, and execute capabilities through plugins.
+AXIS is a modular personal AI operating system designed to understand requests, plan actions, and execute capabilities through plugins.
 
-The goal is not just adding features.
+The current repository is a tested Python foundation. Development should strengthen the existing architecture rather than assume future systems already exist.
 
-The goal is building a maintainable intelligence platform.
+## Canonical Architecture
 
----
+The current execution path is:
 
-# Before Making Changes
-
-Always check:
-
-1. What layer does this belong to?
-
-Architecture:
-
-Application
+User
 ↓
-Intelligence
+Agent
 ↓
-Kernel
+Intent Engine
 ↓
-Plugins
+Planner
 ↓
-Infrastructure
+Executor
+↓
+Runtime
+↓
+Plugin Manager
+↓
+Plugin
+↓
+Result / Response
 
-Never place logic in the wrong layer.
+Memory is accessed through Runtime. Command Engine exists and is tested, but currently serves as a supporting plan-to-task conversion subsystem rather than a required stage in `Agent.process()`.
 
----
+For authoritative current-state details, use `docs/ARCHITECTURE_MAP.md` and `standards/ARCHITECTURE_RULES.md`.
 
-# Required Workflow
+## Before Making Changes
 
-## Step 1 - Design
+Always:
 
-Before coding:
+1. Inspect the relevant implementation and tests.
+2. Identify the owning architectural layer.
+3. Check the canonical project and architecture documents.
+4. Define expected behavior and affected files.
+5. Identify architecture impact before editing.
+
+Do not place logic in the wrong layer.
+
+## Required Workflow
+
+### Step 1 - Design
 
 Define:
 
@@ -44,111 +54,62 @@ Define:
 - Expected behavior
 - Files affected
 - Architecture impact
+- Compatibility considerations
 
----
-
-## Step 2 - Implementation
+### Step 2 - Implementation
 
 Follow:
 
-- AI Constitution
-- Architecture Rules
-- Coding Standards
-- Plugin Specification
+- `standards/AI_CONSTITUTION.md`
+- `standards/ARCHITECTURE_RULES.md`
+- `standards/CODING_STANDARDS.md`
+- `standards/PLUGIN_SPEC.md`
 
----
+Prefer the smallest coherent change and reuse existing systems.
 
-## Step 3 - Testing
+### Step 3 - Testing
 
 Run:
 
 ```powershell
+python -m pytest
+```
+
+If configured, also run:
+
+```powershell
 ruff check .
-pytest
+ruff format .
+```
 
-Verify:
+Verify existing and new functionality and confirm no architecture rules were violated.
 
-- Existing functionality works
-- New functionality works
-- No architecture rules were violated
-
----
-
-## Step 4 - Review
+### Step 4 - Review
 
 Ask:
 
 - Does this duplicate existing functionality?
 - Does this create hidden dependencies?
-- Does this break plugin compatibility?
-- Does this belong in another layer?
+- Does this bypass Runtime?
+- Does this break plugin isolation?
+- Does this change architectural ownership?
+- Does documentation need synchronization?
 
----
+### Step 5 - Commit
+
+Keep commits focused. Explain what changed and why.
 
 ## AI Responsibilities
 
-### ChatGPT
+AI assistants are implementation and review tools, not silent architecture authorities. Architectural conflicts should be surfaced before changing boundaries.
 
-Architecture authority.
+## Git Rules
 
-Used for:
+Do not work directly on protected release branches. Use focused feature or lab branches appropriate to the current development phase.
 
-- Planning
-- System design
-- Debugging strategy
+## Definition of Complete
 
----
-
-### GitHub Copilot
-
-Implementation assistant.
-
-Used for:
-
-- Writing code
-- Refactoring
-- Boilerplate
-
-Must follow:
-
-`.github/copilot-instructions.md`
-
----
-
-### Claude
-
-Review assistant.
-
-Used for:
-
-- Large reviews
-- Documentation
-- Alternative analysis
-
----
-
-# Git Rules
-
-Never work directly on main.
-
-Branches:
-main
-develop
-lab-005-memory-layer
-lab-006-time
-feature/*
-
-
-Every commit should explain:
-
-- What changed
-- Why it changed
-
----
-
-# Definition of Complete
-
-A feature is complete when:
+A feature is complete when it is:
 
 ✓ Designed
 
@@ -156,18 +117,12 @@ A feature is complete when:
 
 ✓ Tested
 
-✓ Documented
+✓ Documented when required
 
 ✓ Reviewed
 
 ✓ Committed
 
----
+## Core Principle
 
-# Core Principle
-
-Speed comes from automation.
-
-Stability comes from discipline.
-
-LAB AI OS must grow without losing its architecture.
+Speed comes from automation. Stability comes from discipline. AXIS must grow without losing its architecture.
