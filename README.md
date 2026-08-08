@@ -1,179 +1,333 @@
-# AXIS Formerly LAB AI OS.
+# AXIS
 
-AXIS is a personal AI operating system designed for autonomous assistance, memory, reasoning, and extensible capabilities.
+**AXIS** is an AI orchestration platform designed to coordinate intent, planning, execution, memory, and extensible capabilities.
 
-LAB AI OS is an experimental operating system for autonomous AI agents. It combines memory, reasoning, planning, workflow orchestration, secure tool execution, connector integrations, and multi-agent collaboration into a single, extensible platform. The goal is to provide a reliable runtime and developer environment so teams and researchers can build, coordinate, and scale intelligent agents safely and productively.
+AXIS is being developed incrementally. The repository contains a working core architecture while larger capabilities such as advanced model orchestration, voice control, and operating-system automation remain future development.
 
----
-
-## Mission Statement
-
-To become the open, extensible operating system for autonomous AI: enabling agents to remember, plan, act, and collaborate across tools and services while preserving safety, auditability, and developer ergonomics.
+> **Important:** The current implementation is defined by the code and tests in this repository. Future capabilities must not be treated as implemented until they exist and are verified.
 
 ---
 
-## Core Features
+## Current Status
 
-- Memory: Persistent, structured and semantic memory for agents to store and recall facts, observations, and context.
-- Reasoning: Pluggable reasoning modules that allow agents to derive conclusions, validate plans, and prioritize actions.
-- Planning & Workflows: Task planning and workflow engines to decompose goals into executable steps and coordinate multi-step processes.
-- Tool Execution: Secure sandboxed execution of tools and actions with clear audit trails and capability-scoped access.
-- Connectors: Integrations for cloud APIs, LLM providers, databases, file systems, and third-party services.
-- Multi-Agent Collaboration: Facilities for agents to coordinate, delegate, and negotiate work in distributed or local settings.
-- Observability & Auditing: Traces, logs, and decision records for explainability and debugging.
+The current AXIS core includes:
+
+* Agent coordination
+* Intent resolution
+* Execution planning
+* Execution-plan traversal
+* Central Runtime execution boundary
+* Plugin management
+* Plugin architecture
+* Persistent memory
+* Memory recovery
+* Runtime persistence
+* Command/task conversion infrastructure
+* Logging infrastructure
+* Automated tests
+
+The current verified test suite should be run before and after architectural changes.
 
 ---
 
-## Architecture Overview
+## Architecture
 
-LAB AI OS is organized around a modular, layered architecture:
+AXIS currently follows this execution path:
 
-- Kernel: Core runtime and orchestration (scheduling, lifecycle, capability management).
-- Memory: Persistent storage layer with structured and semantic interfaces.
-- Connectors: Adapter layer for external services and tools.
-- Registry & Resolver: Service and capability discovery, plus policy-based resolution of resources.
-- Workers: Isolated execution environments for tasks and tools.
-- Interfaces: APIs and SDKs for embedding agents, integrating UIs, and exposing services.
-- Planner: High-level goal decomposition and workflow execution engine.
+```text
+User
+  ↓
+Agent
+  ↓
+Intent Engine
+  ↓
+Planner
+  ↓
+Executor
+  ↓
+Runtime
+  ↓
+Plugin Manager
+  ↓
+Plugin
+  ↓
+Result / Response
+```
 
-Components communicate via well-defined interfaces and message contracts, enabling safe extensions and third-party contributions.
+### Component responsibilities
+
+| Component      | Responsibility                                           |
+| -------------- | -------------------------------------------------------- |
+| Agent          | Application-level coordination                           |
+| Intent Engine  | Converts user input into structured intent               |
+| Planner        | Creates execution plans                                  |
+| Executor       | Traverses execution plans                                |
+| Runtime        | Central execution boundary                               |
+| Plugin Manager | Registers and resolves plugins                           |
+| Plugins        | Provide isolated capabilities                            |
+| Memory         | Persistent state and retrieval                           |
+| Command Engine | Converts plan steps into executable task representations |
+| Logger         | Operational logging                                      |
+
+Runtime is the central boundary for capability execution.
+
+Plugins must not bypass Runtime or create alternate orchestration paths.
+
+For the detailed current-state architecture, see `docs/ARCHITECTURE_MAP.md`.
+
+For binding architectural rules, see `standards/ARCHITECTURE_RULES.md`.
 
 ---
 
 ## Repository Structure
 
-- docs/               — Design docs, roadmap, decisions, and requirements.
-- kernel/             — Core runtime and orchestration primitives.
-- connectors/         — External service and provider adapters.
-- registry/           — Service registry and capability discovery.
-- resolver/           — Resource/credential resolution logic.
-- workers/            — Sandboxed worker implementations and runtimes.
-- memory/             — Persistent and semantic memory implementations.
-- interfaces/         — API surface, SDKs and protocol definitions.
-- tests/              — Unit, integration, and system tests.
-- scripts/            — Developer scripts and automation.
+The current repository is organized around the implemented architecture:
 
----
-
-## Installation
-
-Prerequisites:
-
-- Git
-- A recent runtime for development (e.g., Node.js, Python, or Rust depending on chosen components)
-- (Optional) Docker for running isolated worker environments
-
-Clone the repository:
-
-```bash
-git clone https://github.com/<your-org>/lab-ai-os.git
-cd lab-ai-os
+```text
+AXIS/
+├── agent/
+│   └── Agent coordination
+│
+├── kernel/
+│   ├── command_engine.py
+│   ├── intent_engine.py
+│   ├── memory.py
+│   ├── plugin_manager.py
+│   └── runtime.py
+│
+├── planner/
+│   ├── execution_plan.py
+│   ├── interfaces.py
+│   ├── planner.py
+│   └── step.py
+│
+├── execution/
+│   ├── executor.py
+│   └── result.py
+│
+├── core/
+│   └── logger.py
+│
+├── config/
+│   └── settings.py
+│
+├── tests/
+│
+├── docs/
+├── standards/
+├── AGENTS.md
+├── main.py
+├── requirements.txt
+└── README.md
 ```
 
-Follow component-specific README files under each top-level folder for language/runtime-specific setup instructions.
+The repository structure may evolve as AXIS develops, but architectural ownership must remain explicit.
 
 ---
 
-## Quick Start
+## Memory
 
-1. Install runtime dependencies for the kernel and a connector (see their README).
-2. Start the kernel (example):
+Memory is a first-class AXIS subsystem.
 
-```bash
-# from repo root
-cd kernel
-# run the kernel using the language/runtime toolchain (example)
-# node ./dev-server.js
+The current memory layer supports persistent storage and retrieval of AXIS state and project context, including recovery behavior for corrupted persistence data.
+
+Memory is accessed through Runtime in the current architecture.
+
+Runtime persistence and memory behavior are covered by automated tests.
+
+---
+
+## Plugins
+
+AXIS uses a plugin architecture to isolate capability-specific functionality from the orchestration core.
+
+Plugins are managed through the Plugin Manager and executed through Runtime.
+
+This architecture allows new capabilities to be added without turning the Agent, Planner, or Runtime into collections of unrelated capability-specific implementations.
+
+---
+
+## Command Engine
+
+The Command Engine is currently implemented as a supporting task/command conversion subsystem.
+
+It is **not currently a required stage in the primary `Agent.process()` execution path**.
+
+It must not be treated as a replacement for the Executor or Runtime.
+
+Its architectural role may expand in future development, but such a change requires explicit implementation, testing, and documentation.
+
+---
+
+## Development
+
+AXIS is currently developed in Python.
+
+Create and activate the project virtual environment before installing dependencies.
+
+Example PowerShell workflow:
+
+```powershell
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+pip install -r requirements.txt
 ```
 
-3. Launch a worker and register a connector in a separate shell.
-4. Use the CLI or SDK (interfaces/) to create an agent, load memory, and execute a simple plan.
+Run the test suite:
 
-Refer to docs/ROADMAP.md for a minimal example workflow to verify end-to-end behavior.
+```powershell
+python -m pytest -q
+```
 
----
+For isolated pytest temporary files:
 
-## Configuration
-
-Configuration is component-scoped and centralized through the kernel’s configuration store. Example configuration items:
-
-- Connector credentials (kept out of repo; use environment variables or secrets manager)
-- Memory backend selection (file, sqlite, vector DB)
-- Worker runtime options (isolation, timeouts, resource limits)
-- Policy and capability scopes for agents
-
-Use the `config/` or environment variables to supply secrets and sensitive values. Never commit credentials to source control.
-
----
-
-## Example Workflow
-
-A basic example: find all PDF documents in a user folder and summarize them.
-
-1. Agent boots and loads configuration and memory.
-2. Planner decomposes "summarize PDFs in Documents" into steps: list files, filter PDFs, fetch contents, summarize.
-3. Kernel assigns tasks to workers and invokes the filesystem connector to list and read files.
-4. Summaries are stored back to memory with provenance and the agent returns a consolidated report.
-
-This workflow demonstrates connectors, workers, memory, planning, and secure tool execution working together.
-
----
-
-## Development Guide
-
-- Follow the code style and testing conventions defined in each submodule.
-- Write unit tests for logic-heavy modules and integration tests for connector interactions.
-- Use the `tests/` folder to add cross-component scenarios that mimic real agent workflows.
-- Document design decisions and API contracts under `docs/`.
-
-Suggested workflow:
-
-```bash
-# create feature branch
-git checkout -b feat/my-feature
-# run local tests
-# make changes and add tests
-git add -A
-git commit -m "feat: add ..."
-git push origin feat/my-feature
-# open a PR and request reviews
+```powershell
+python -m pytest -q --basetemp="$env:TEMP\axis-pytest-temp"
 ```
 
 ---
 
-## Contributing
+## Development Workflow
 
-Contributions are welcome. Please follow these guidelines:
+AXIS follows a controlled development process:
 
-1. Open an issue to discuss major changes before implementing.
-2. Fork the repo and work on feature branches.
-3. Keep changes small and focused; add tests and docs for new features.
-4. Follow semantic commit messages and include motivation in PR descriptions.
-5. Respect security — do not commit credentials or sensitive data.
+```text
+Architecture / Design
+        ↓
+Implementation
+        ↓
+Testing
+        ↓
+Review
+        ↓
+Documentation synchronization
+        ↓
+Commit
+```
 
-See CONTRIBUTING.md (if present) for a detailed process.
+Changes should be small and intentional.
+
+Before changing an architectural boundary:
+
+1. Inspect the existing implementation.
+2. Inspect relevant tests.
+3. Identify affected documentation.
+4. Define the intended change.
+5. Implement the smallest coherent change.
+6. Add or update tests.
+7. Run the test suite.
+8. Synchronize canonical documentation.
+9. Review the Git diff.
+10. Commit the change.
 
 ---
 
-## License
+## AI-Assisted Development
 
-This project is released under the MIT License — see LICENSE for details.
+AXIS uses AI development tools as engineering assistants.
+
+AI tools may assist with:
+
+* Architecture analysis
+* Implementation
+* Debugging
+* Refactoring
+* Testing
+* Documentation
+* Code review
+
+AI tools must follow the canonical AXIS architecture.
+
+They must not:
+
+* Invent nonexistent subsystems.
+* Treat future architecture as implemented.
+* Bypass Runtime.
+* Create duplicate execution systems.
+* Change architectural ownership without an explicit decision.
+* Rewrite working systems unnecessarily.
+* Ignore existing tests or compatibility constraints.
+
+The human project owner retains final authority over architectural and product decisions.
+
+See:
+
+* `AGENTS.md`
+* `docs/AI_WORKFLOW.md`
+* `.github/prompts/`
+* `standards/ARCHITECTURE_RULES.md`
+
+---
+
+## Documentation
+
+Important documentation:
+
+| Document                          | Purpose                                        |
+| --------------------------------- | ---------------------------------------------- |
+| `docs/ARCHITECTURE_MAP.md`        | Canonical current-state execution architecture |
+| `docs/ARCHITECTURE.md`            | High-level architecture                        |
+| `standards/ARCHITECTURE_RULES.md` | Binding architecture rules                     |
+| `docs/DECISIONS.md`               | Architecture decisions                         |
+| `docs/AI_WORKFLOW.md`             | AI development workflow                        |
+| `docs/REQUIREMENTS.md`            | Project requirements                           |
+| `docs/VISION.md`                  | Long-term project vision                       |
+| `AGENTS.md`                       | AI engineering instructions                    |
+
+These documents must remain consistent with the verified implementation.
 
 ---
 
 ## Future Vision
 
-LAB AI OS aims to become the foundational runtime for autonomous agents: a stable, auditable, and extensible OS that lets developers and organizations deploy safe multi-agent systems. Future directions include:
+AXIS is intended to grow into a broader AI operating and orchestration platform.
 
-- First-class support for distributed multi-agent clusters
-- Pluggable verified capability sandboxes
-- Integrated policy and governance tooling for compliance
-- Rich developer tooling and marketplaces for connectors and skills
+Potential future capabilities include:
 
-Join the community to help shape the future of autonomous AI infrastructure.
+* Local LLM integration through Ollama
+* Multiple LLM provider integration
+* Intelligent model selection
+* Voice-controlled interaction
+* Desktop and operating-system automation
+* Expanded tool and connector support
+* Advanced memory and retrieval
+* Multi-agent coordination
+* Sandboxed capability execution
+* Advanced observability
+* Workflow automation
+* Greater autonomy
+
+These are **future capabilities**, not claims about the current implementation.
+
+Development will proceed incrementally, with each major capability becoming part of the canonical architecture only after it has been implemented and verified.
 
 ---
 
-Questions, ideas, or want to get involved? Open an issue or reach out via GitHub discussions.
+## Contributing
 
+Keep changes focused and consistent with the architecture.
 
+Before submitting a change:
+
+```powershell
+python -m pytest -q
+```
+
+Review:
+
+```powershell
+git diff
+git status
+```
+
+Do not commit generated runtime data, credentials, virtual environments, or other files excluded by `.gitignore`.
+
+---
+
+## Project Principle
+
+> **AI creates speed. Architecture creates survival.**
+
+AXIS should become more capable without becoming less understandable.
+
+Every feature should strengthen the system rather than merely increase its feature count.

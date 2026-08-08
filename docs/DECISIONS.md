@@ -1,216 +1,353 @@
-# Architecture Decision Records (ADRs)
+# AXIS Architecture Decision Records
 
-This document collects Architecture Decision Records for LAB AI OS. Each record provides a concise description of a single architectural decision and its rationale.
+This document records significant architectural decisions made during AXIS development.
+
+ADRs document decisions and their historical context. They do not override the current implementation or the binding current-state architecture rules.
 
 ---
 
-## ADR-001: Repository structure
+## ADR-001: Repository Structure
 
-- Decision Number: ADR-001
-- Status: Accepted
-- Date: 2026-08-04
+- **Status:** Accepted
+- **Date:** 2026-08-04
 
 ### Context
-A clear repository layout is required to support modular development, easy discovery, and CI automation for an OS-like project.
+
+AXIS requires a modular repository structure that supports separation of responsibilities, testing, documentation, and incremental development.
 
 ### Decision
-Adopt a top-level layout with `docs/`, `kernel/`, `connectors/`, `registry/`, `resolver/`, `workers/`, `memory/`, `interfaces/`, `tests/`, and `scripts/`.
+
+AXIS uses a modular Python repository organized around its core subsystems, including:
+
+- `agent/`
+- `config/`
+- `core/`
+- `execution/`
+- `kernel/`
+- `planner/`
+- `tests/`
+- `docs/`
+- `standards/`
 
 ### Consequences
-- Encourages clear separation of concerns and ownership.
-- Simplifies CI and package boundaries.
-- Requires discipline to keep boundaries honored.
 
-### Alternatives Considered
-- Monolithic layout (rejected for lack of modular clarity).
+- Responsibilities remain separated.
+- Core components can evolve independently.
+- Architectural boundaries must be maintained as the system grows.
 
 ---
 
-## ADR-002: Python as the primary language
+## ADR-002: Python as the Primary Language
 
-- Decision Number: ADR-002
-- Status: Accepted
-- Date: 2026-08-04
+- **Status:** Accepted
+- **Date:** 2026-08-04
 
 ### Context
-Rapid prototyping, wide ecosystem for AI/ML, and large set of libraries for connectors and tooling are needed.
+
+AXIS requires rapid development, automation support, and access to the Python ecosystem for AI and systems development.
 
 ### Decision
-Adopt Python as the primary language for core components and SDKs while keeping interfaces language-agnostic and supporting bindings for other languages.
+
+Python is the primary implementation language for the AXIS core.
 
 ### Consequences
-- Faster innovation and access to ML ecosystem.
-- Need to enforce performance-critical components via native extensions or separate runtimes (if required).
 
-### Alternatives Considered
-- Go/Rust for core (rejected due to developer velocity and ML ecosystem limitations).
+- Rapid development and iteration.
+- Broad ecosystem support.
+- External integrations can be introduced through defined interfaces as the project evolves.
 
 ---
 
-## ADR-003: Modular architecture
+## ADR-003: Modular Architecture
 
-- Decision Number: ADR-003
-- Status: Accepted
-- Date: 2026-08-04
+- **Status:** Accepted
+- **Date:** 2026-08-04
 
 ### Context
-Scalability, extensibility, and independent deployment are primary goals.
+
+AXIS needs clearly separated responsibilities so that planning, execution, memory, and capabilities do not become a single monolithic system.
 
 ### Decision
-Design the system as discrete modules with well-defined interfaces (Kernel, Memory, Workers, Connectors, etc.).
 
-### Consequences
-- Easier to replace and scale parts of the system independently.
-- Requires robust interface versioning and testing.
+AXIS is organized into distinct components with explicit ownership boundaries.
 
-### Alternatives Considered
-- Monolithic single-binary approach (rejected).
+The current execution architecture is:
 
----
+```text
+User
+  ↓
+Agent
+  ↓
+Intent Engine
+  ↓
+Planner
+  ↓
+Executor
+  ↓
+Runtime
+  ↓
+Plugin Manager
+  ↓
+Plugin
+  ↓
+Result / Response
 
-## ADR-004: GitHub for version control
+Memory is accessed through Runtime.
 
-- Decision Number: ADR-004
-- Status: Accepted
-- Date: 2026-08-04
+Consequences
+Components have clear responsibilities.
+Execution ownership remains centralized.
+Capabilities can be added without embedding capability-specific behavior into the Agent or Planner.
+ADR-004: GitHub for Version Control
+Status: Accepted
+Date: 2026-08-04
+Context
 
-### Context
-A collaborative development platform with integrated PRs, issues, and CI is required.
+AXIS requires version control, development history, remote backup, and collaboration support.
 
-### Decision
-Use GitHub as the primary repository and collaboration platform.
+Decision
 
-### Consequences
-- Streamlines community contributions and CI integration.
-- Dependency on GitHub-specific features; mitigate via open standards.
+Git and GitHub are used as the primary version-control and repository platform.
 
-### Alternatives Considered
-- Self-hosted GitLab (considered but GitHub's community network made it preferable).
+Consequences
+Development history is preserved.
+Branches and checkpoints provide recovery points.
+Remote collaboration and review are available.
+ADR-005: VS Code as Development Environment
+Status: Accepted
+Date: 2026-08-04
+Context
 
----
+AXIS requires a practical local development environment with strong Python and Git support.
 
-## ADR-005: VS Code as development environment
+Decision
 
-- Decision Number: ADR-005
-- Status: Accepted
-- Date: 2026-08-04
+Visual Studio Code is the recommended development environment.
 
-### Context
-A common development environment reduces onboarding friction and enables consistent editor integrations.
+Consequences
+Consistent local development workflow.
+Strong Python tooling.
+Easy integration with AI development tools.
 
-### Decision
-Recommend Visual Studio Code as the primary development environment and provide workspace settings and recommended extensions.
+The architecture does not depend on a specific editor.
 
-### Consequences
-- Easier onboarding and consistent developer experience.
-- Avoid hard-locking on a single editor; developers may use alternatives.
+ADR-006: Multi-Provider AI Integration
+Status: Proposed
+Date: 2026-08-04
+Context
 
-### Alternatives Considered
-- JetBrains IDEs or Emacs/Vim (supported but not recommended by default).
+AXIS is intended to work with multiple AI systems rather than permanently depend on a single provider.
 
----
+Decision
 
-## ADR-006: Claude Code integration
+AXIS should eventually support multiple AI providers through explicit integration boundaries.
 
-- Decision Number: ADR-006
-- Status: Proposed
-- Date: 2026-08-04
+Potential providers include local and external AI models.
 
-### Context
-Support for multiple LLM providers is needed. Claude has a strong API and aligns with some privacy goals.
+Current Status
 
-### Decision
-Integrate Claude as one of the first-class connector options, implemented through the Connector framework.
+Provider integration and intelligent model routing are future capabilities unless implemented and verified in the current codebase.
 
-### Consequences
-- Fast access to Claude capabilities; must maintain provider-agnostic abstraction to support other LLMs.
-- Ongoing maintenance for provider API changes.
+Consequences
 
-### Alternatives Considered
-- OpenAI-only integration (rejected to avoid single-provider lock-in).
+Core orchestration should avoid unnecessary provider-specific assumptions.
 
----
+ADR-007: External Capability Integration
+Status: Proposed
+Date: 2026-08-04
+Context
 
-## ADR-007: MCP protocol
+AXIS is intended to interact with external tools, applications, filesystems, and services.
 
-- Decision Number: ADR-007
-- Status: Proposed
-- Date: 2026-08-04
+Decision
 
-### Context
-A clear protocol for message passing and agent coordination is necessary.
+External capabilities should be introduced through controlled capability/plugin boundaries rather than being embedded directly into core orchestration components.
 
-### Decision
-Adopt a lightweight Multiparty Coordination Protocol (MCP) for agent-to-agent and kernel-to-agent communication. MCP will define message envelopes, capability claims, and negotiation primitives.
+Current Status
 
-### Consequences
-- Standardized communication simplifies orchestration.
-- Requires careful design for security and versioning.
+The plugin architecture is implemented.
 
-### Alternatives Considered
-- Reuse existing messaging standards (AMQP/HTTP) as-is; MCP provides domain-specific semantics.
+Specific external integrations are future work unless their implementation and tests exist in the current repository.
 
----
+Consequences
+Capabilities remain isolated.
+New integrations can be introduced incrementally.
+Core orchestration remains independent from capability-specific implementation.
+ADR-008: Memory-First Design
+Status: Accepted
+Date: 2026-08-04
+Context
 
-## ADR-008: Memory-first design
+A persistent AI system requires continuity across interactions and runtime sessions.
 
-- Decision Number: ADR-008
-- Status: Accepted
-- Date: 2026-08-04
+Decision
 
-### Context
-Long-lived agents need persistent context and provenance to be effective.
+Memory is a first-class AXIS subsystem responsible for persistence and retrieval of AXIS state and history.
 
-### Decision
-Prioritize memory as a first-class system capability: the kernel and planners will treat memory access and write semantics as part of the core contract.
+Runtime provides the controlled access boundary for memory.
 
-### Consequences
-- Stronger continuity for agents but requires strict privacy and retention controls.
-- Memory design becomes a focal point for compliance and security.
+Current Status
 
-### Alternatives Considered
-- Stateless or ephemeral-first designs (rejected for long-term agent utility).
+The memory subsystem is implemented and includes persistence, retrieval, and recovery behavior.
 
----
+Consequences
+AXIS can retain information across runtime sessions.
+Storage responsibilities remain centralized.
+Other components must use defined memory interfaces rather than duplicating persistence logic.
+ADR-009: Centralized Runtime Execution
+Status: Accepted
+Date: 2026-08-07
+Context
 
-## ADR-009: Multi-agent architecture
+Multiple execution paths would make capability behavior difficult to control and create architectural ambiguity.
 
-- Decision Number: ADR-009
-- Status: Accepted
-- Date: 2026-08-04
+Decision
 
-### Context
-Complex workflows benefit from specialization and parallelism.
+Runtime is the central execution boundary for AXIS.
 
-### Decision
-Support multi-agent ensembles with discovery, delegation, and coordination primitives built into the Registry and Kernel.
+The Executor delegates capability execution to Runtime.
 
-### Consequences
-- Facilitates specialization and scale; requires robust conflict resolution and governance.
+The Plugin Manager coordinates plugin registration and resolution for Runtime.
 
-### Alternatives Considered
-- Single-agent orchestrator approach (rejected for scalability and specialization limitations).
+Plugins perform capability-specific operations but do not create alternate orchestration paths.
 
----
+Consequences
+Execution ownership is explicit.
+Plugins cannot silently create independent execution systems.
+Runtime remains the controlled boundary between orchestration and capabilities.
+ADR-010: Planner and Executor Separation
+Status: Accepted
+Date: 2026-08-07
+Context
 
-## ADR-010: Future plugin system
+Planning and execution have different responsibilities and should remain independently testable.
 
-- Decision Number: ADR-010
-- Status: Proposed
-- Date: 2026-08-04
+Decision
 
-### Context
-Ecosystem growth and third-party integrations are strategic goals.
+The Planner creates ExecutionPlan objects containing Step objects.
 
-### Decision
-Design an extensible plugin system with metadata, signing, and sandboxing for third-party skills and connectors; implement a minimal prototype in an early milestone.
+The Executor traverses and executes those plans.
 
-### Consequences
-- Opens a path for ecosystem growth; introduces supply-chain and trust considerations.
+The Planner does not directly execute plugins or perform execution side effects.
 
-### Alternatives Considered
-- Closed marketplace controlled by core maintainers (rejected to encourage community adoption).
+Consequences
+Plans can be inspected independently of execution.
+Planning remains separate from capability execution.
+Execution behavior can be tested independently.
+ADR-011: Command Engine as Supporting Subsystem
+Status: Accepted
+Date: 2026-08-07
+Context
 
----
+AXIS contains a Command Engine for converting structured plans into executable task representations.
 
-_For each ADR, follow-up work items should be created to track specification, implementation, and verification._
+Without a defined boundary, the Command Engine could become a duplicate execution system.
+
+Decision
+
+The Command Engine is a supporting command/task-conversion subsystem.
+
+It is not a required stage in the current Agent.process() execution path.
+
+The Command Engine must not:
+
+execute plugins directly
+bypass Runtime
+replace the Executor
+create an alternate execution path
+Consequences
+
+Command conversion can evolve independently while execution ownership remains centralized.
+
+ADR-012: Plugin-Based Capability Architecture
+Status: Accepted
+Context
+
+AXIS requires extensible capabilities without embedding every capability into the orchestration core.
+
+Decision
+
+Capabilities are exposed through plugins managed by the Plugin Manager.
+
+Plugins are isolated from one another and from direct application orchestration.
+
+Consequences
+Capabilities are replaceable.
+New capabilities can be added incrementally.
+Plugin-specific behavior remains outside core orchestration components.
+ADR-013: Current-State Documentation
+Status: Accepted
+Date: 2026-08-07
+Context
+
+AXIS is developed with multiple AI tools. Documentation drift can cause different development tools to operate from conflicting architectural assumptions.
+
+Decision
+
+Current-state documentation must describe what the repository actually implements.
+
+Future architecture must be clearly separated from current implementation.
+
+The canonical current-state architecture is defined by:
+
+docs/ARCHITECTURE_MAP.md
+standards/ARCHITECTURE_RULES.md
+
+The high-level architecture is documented in:
+
+docs/ARCHITECTURE.md
+Consequences
+AI tools have a consistent architectural reference.
+Documentation cannot silently redefine implementation.
+Architectural changes require corresponding documentation updates.
+ADR-014: Tests as Architectural Verification
+Status: Accepted
+Date: 2026-08-07
+Context
+
+Architectural claims should be supported by verified behavior wherever practical.
+
+Decision
+
+Changes to core behavior must be verified through automated tests.
+
+The current core test suite must pass before a development checkpoint is considered stable.
+
+Consequences
+Regressions are detected earlier.
+Architectural changes can be validated against executable behavior.
+Documentation can be compared against verified implementation.
+Historical Architecture
+
+Earlier AXIS/LAB AI OS documentation described concepts including:
+
+Registry
+Resolver
+Workers
+Event Bus
+Connectors
+distributed scheduling
+multi-agent clusters
+generalized interfaces and SDK layers
+
+These concepts may remain relevant to the long-term vision or requirements, but they are not part of the current architecture unless implemented and verified.
+
+Historical architecture must not be presented as current implementation.
+
+ADR Governance
+
+Before changing an architectural boundary:
+
+Inspect the current implementation.
+Inspect affected tests.
+Identify affected documentation.
+Record the intended architectural decision.
+Implement the smallest coherent change.
+Run affected tests.
+Synchronize canonical documentation.
+Review the Git diff.
+Commit only after verification.
+
+ADRs should be updated or superseded when an approved architectural decision changes.
+
+ADRs do not replace the current implementation, automated tests, or binding architecture rules.

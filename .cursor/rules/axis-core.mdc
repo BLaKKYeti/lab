@@ -1,14 +1,16 @@
-# AXIS Current Execution Pipeline
+# AXIS Current Execution Architecture
 
 The current implemented execution pipeline is:
 
 User
 ↓
+Agent
+↓
 Intent Engine
 ↓
-Command Engine
-↓
 Planner
+↓
+Executor
 ↓
 Runtime
 ↓
@@ -16,22 +18,26 @@ Plugin Manager
 ↓
 Plugin
 ↓
-Response
+Result / Response
 
-Do not reorder these layers without an approved architecture decision.
+Memory is accessed through Runtime.
+
+Command Engine is implemented and tested as a supporting plan-to-task conversion subsystem. It is not currently a required stage in `Agent.process()`.
+
+Do not reorder, bypass, or duplicate the current execution boundaries without an approved architecture decision.
 
 # Architecture Evolution
 
-AXIS contains two architectural views:
+AXIS has two architectural dimensions:
 
 1. Current implementation architecture
-- what exists today
-- must be preserved
+   - Describes what exists and is tested today.
+   - Must remain synchronized with the implementation.
 
-2. Future operating system architecture
-- long-term vision
-- guides future design
+2. Future vision and planned capabilities
+   - Describes systems AXIS may implement later.
+   - Must never be represented as currently implemented.
 
 Do not implement future architecture prematurely.
 
-Prefer incremental evolution.
+Prefer incremental, tested evolution of the existing system.

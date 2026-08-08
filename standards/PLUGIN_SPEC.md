@@ -1,12 +1,18 @@
-# LAB AI OS – Plugin Specification
+# AXIS Plugin Specification
+
+## Status
+
+**Binding plugin contract for the current AXIS architecture.**
 
 ## Purpose
 
-Define the standard contract for all LAB AI OS plugins.
+Define the standard contract and responsibilities for AXIS plugins.
+
+Plugins provide isolated capabilities to the AXIS Runtime through the Plugin Manager.
 
 ---
 
-# Plugin Requirements
+## Plugin Requirements
 
 Every plugin must provide:
 
@@ -15,9 +21,11 @@ Every plugin must provide:
 - Execution
 - Health status
 
+Plugins must remain isolated from orchestration logic and from direct plugin-to-plugin communication.
+
 ---
 
-# Required Interface
+## Required Interface
 
 Example:
 

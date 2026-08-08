@@ -1,237 +1,415 @@
-# Architecture — LAB AI OS
+# AXIS Architecture
 
-This document describes the high-level architecture of LAB AI OS, a modular operating system for autonomous AI agents. It provides an overview of system components, their responsibilities, and the data flow between them. The document follows enterprise software documentation standards and includes diagrams that illustrate system structure and request flows.
+## Status
+
+**Canonical high-level architecture for the current AXIS implementation.**
+
+This document describes the architecture that AXIS implements today. It distinguishes current implementation from future capabilities so that development tools and contributors do not mistake planned systems for existing ones.
+
+For the detailed current execution path, see `docs/ARCHITECTURE_MAP.md`.
 
 ---
 
-## System Overview
+## 1. System Overview
 
-LAB AI OS is designed as a modular platform that composes well-defined subsystems to provide safe, auditable, and extensible runtime services for intelligent agents. Key design goals include modularity, security, observability, and extensibility.
+AXIS is an AI orchestration platform designed to coordinate user intent, planning, execution, runtime capabilities, persistent memory, and extensible plugins.
 
-Top-level components:
+The current implementation is centered around a controlled execution pipeline:
 
-- Kernel
-- Memory
-- Registry
-- Resolver
-- Workers
-- Interfaces
-- Connectors
-- Planning Engine
-- Reasoning Engine
-- Tool Execution
-- Event Bus
-
-Mermaid diagram (high level):
-
-```mermaid
-flowchart LR
-  UI[User / Client]
-  Interfaces --> Kernel
-  Kernel --> Planner[Planning Engine]
-  Kernel --> Registry
-  Kernel --> Resolver
-  Kernel --> Memory
-  Kernel --> EventBus
-  Planner --> Workers
-  Workers --> Connectors
-  Workers --> ToolExec[Tool Execution]
-  Reasoner[Reasoning Engine] --> Planner
-  EventBus --> Observability[Observability & Audit]
-  UI --> Interfaces
+```text
+User
+  ↓
+Agent
+  ↓
+Intent Engine
+  ↓
+Planner
+  ↓
+Executor
+  ↓
+Runtime
+  ↓
+Plugin Manager
+  ↓
+Plugin
+  ↓
+Result / Response
 ```
 
----
-
-## Kernel
-
-The Kernel is the core orchestration and runtime manager. Responsibilities:
-
-- Agent lifecycle management (create/start/pause/stop)
-- Capability and policy enforcement
-- Task scheduling and assignment
-- Central configuration and coordination
-- Event bus management and observability hooks
-
-The kernel exposes a stable API surface for Interfaces and programmatic control. It performs leader election and clustering duties in distributed deployments.
+The architecture is intentionally modular. Each subsystem has a defined responsibility and execution boundaries are preserved between components.
 
 ---
 
-## Memory
+## 2. Current Architecture
 
-Memory is the persistent, versioned store for agent state, observations, and artifacts. It is designed for privacy-first operation and supports:
+### Agent
 
-- Structured records and semantic indexes
-- Namespaces and access control for per-agent scoping
-- Provenance metadata for each write (origin, timestamp, confidence)
-- Retention and lifecycle policies
+The Agent is the application-level coordinator.
 
-Memory implementations are pluggable (file, RDBMS, vector DB) behind a clear interface.
+Responsibilities:
 
----
+* Accept user input.
+* Resolve user intent.
+* Create execution plans.
+* Delegate execution to the Executor.
+* Own and coordinate the Runtime instance.
+* Record relevant execution results through Runtime.
+* Produce the final application response.
 
-## Registry
-
-The Registry is the service and capability directory. It holds metadata about available connectors, workers, agents, and published skills. Registry responsibilities:
-
-- Service discovery and capability advertisement
-- Version and compatibility metadata
-- Health and heartbeat monitoring for registered components
+The Agent must not implement plugin-specific capabilities or create an alternate execution path around Runtime.
 
 ---
 
-## Resolver
+### Intent Engine
 
-The Resolver translates logical resource identifiers into concrete endpoints and credentials. It handles:
+The Intent Engine converts user input into structured intent.
 
-- Secrets resolution via secure backends
-- Mapping logical connectors to provider endpoints
-- Applying policy-based routing and prioritized fallbacks
+Responsibilities:
 
-Resolvers are pluggable and may consult external secret stores or vaults.
+* Interpret incoming user requests.
+* Produce structured intent information for the Planner.
+* Separate intent resolution from execution.
 
----
-
-## Workers
-
-Workers perform isolated execution of tasks and tools. Characteristics:
-
-- Sandboxed runtime (process, container, VM) with capability scoping
-- Resource limits (CPU, memory, disk, network)
-- Short-lived and long-lived worker types
-- Execution tracing, logging, and exit status capture
-
-Workers register with the Registry and subscribe to task queues propagated by the Kernel.
+The Intent Engine does not execute plugins or perform capability-specific side effects.
 
 ---
 
-## Interfaces
+### Planner
 
-Interfaces provide external access to LAB AI OS. They include:
+The Planner converts structured intent into an `ExecutionPlan`.
 
-- CLI and SDKs (developer-facing)
-- HTTP/REST and gRPC APIs (service integration)
-- Web and GUI components for human-in-the-loop interactions
+Responsibilities:
 
-Interfaces implement authentication, authorization, and input validation and translate external requests into kernel actions.
+* Determine the steps required to satisfy an intent.
+* Construct `Step` objects.
+* Produce a structured execution plan for the Executor.
 
----
-
-## Connectors
-
-Connectors adapt external systems into the LAB AI OS ecosystem. Examples:
-
-- LLM providers (Claude, OpenAI)
-- File systems and cloud storage
-- Databases, message queues, and enterprise systems
-- Monitoring and analytics platforms
-
-Connectors implement a consistent adapter interface and are registered with the Registry for discovery.
+The Planner does not execute plugins or perform execution-side effects.
 
 ---
 
-## Planning Engine
+### Executor
 
-The Planning Engine converts high-level goals into actionable workflows. Responsibilities:
+The Executor traverses and executes an `ExecutionPlan`.
 
-- Goal decomposition into DAGs of tasks
-- Dependency resolution and task prioritization
-- Integration points for the Reasoning Engine to validate or refine plans
+Responsibilities:
 
-Planning outputs are canonical task graphs consumed by the Kernel to schedule work to Workers.
+* Process plan steps in the defined execution order.
+* Delegate capability execution to Runtime.
+* Preserve structured execution results.
 
----
+The Executor is responsible for plan traversal, but Runtime remains the central execution boundary.
 
-## Reasoning Engine
-
-The Reasoning Engine provides higher-order inference, verification, and validation capabilities. Typical responsibilities:
-
-- Evaluate trade-offs and constraints for plans
-- Verify assumptions against memory and external facts
-- Produce explanations, confidence scores, and counterfactual checks
-
-Reasoning modules can be composed from multiple engines (symbolic, probabilistic, neural) and are designed to be replaceable.
+The Executor must not contain plugin-specific implementations.
 
 ---
 
-## Tool Execution
+### Runtime
 
-Tool Execution is the subsystem that manages invocation of external tools and APIs. It ensures:
+Runtime is the central execution boundary of AXIS.
 
-- Capability-scoped access tokens and least-privilege execution
-- Execution sandboxing with constraints and timeouts
-- Secure input/output marshalling and logging
+Responsibilities:
 
-Tool Execution runs inside Workers and reports structured execution traces back to the Event Bus and Memory when needed.
+* Coordinate execution of capabilities.
+* Coordinate the Plugin Manager.
+* Provide controlled access to persistent Memory.
+* Execute validated plugin operations.
+* Return structured execution results.
+* Provide the boundary between orchestration and capability execution.
 
----
-
-## Event Bus
-
-The Event Bus is the central message backbone for asynchronous communication. It supports:
-
-- Publish/subscribe semantics for lifecycle events, task events, and telemetry
-- Durable message semantics for critical workflow steps
-- Integration with observability pipelines (metrics, logs, traces)
-
-The Event Bus enables loose coupling and extensibility across modules.
+Runtime must not become a general-purpose application layer or contain plugin-specific business logic.
 
 ---
 
-## Data Flow
+### Plugin Manager
 
-This section explains the typical flow of a user request through the system.
+The Plugin Manager manages the available plugins used by Runtime.
 
-Mermaid flow diagram:
+Responsibilities:
 
-```mermaid
-flowchart TD
-  A[User Input / Client] -->|API call| B(Interface Layer)
-  B --> |Authenticate & Validate| C[Kernel]
-  C --> |Create Goal| D(Planning Engine)
-  D --> |Task Graph| E[Kernel Scheduler]
-  E --> |Dispatch| F[Worker]
-  F --> |Resolve resources| G(Resolver)
-  F --> |Read/Write| H[Memory]
-  F --> |Call| I[Connectors]
-  I --> |External API| J[Third-party Service]
-  F --> |Tool Output| K[Tool Execution Subsystem]
-  K --> |Execution Trace| L[Event Bus]
-  H --> |Store results| M[Memory]
-  L --> |Emit audit events| N[Observability]
-  M --> |Return result| O[Kernel]
-  O --> |Response| P[Interface Layer]
-  P --> |Return to user| A
+* Register plugins.
+* Resolve plugins.
+* Coordinate plugin access for Runtime.
+* Keep plugin implementations isolated from the core orchestration flow.
+
+The Plugin Manager does not replace Runtime as the execution boundary.
+
+---
+
+### Plugins
+
+Plugins expose isolated capabilities to AXIS.
+
+Responsibilities:
+
+* Implement capability-specific behavior.
+* Receive execution requests through the Runtime/Plugin Manager path.
+* Return capability-specific results.
+
+Plugins must remain isolated from the application's orchestration logic.
+
+Plugins must not:
+
+* Create alternate execution paths.
+* Directly control the Agent.
+* Bypass Runtime.
+* Depend directly on other plugins for orchestration.
+
+---
+
+### Memory
+
+Memory is a persistent subsystem of AXIS.
+
+Responsibilities include:
+
+* Persisting conversations and records.
+* Retrieving stored information.
+* Searching relevant records.
+* Maintaining persistent project and agent context.
+* Supporting recovery behavior.
+* Preserving structured state across runtime sessions.
+
+Memory is accessed through the Runtime boundary in the current architecture.
+
+Memory owns persistence logic and callers should use its defined interfaces rather than duplicating storage behavior.
+
+---
+
+### Command Engine
+
+The Command Engine is an implemented supporting subsystem.
+
+It converts structured execution-plan steps into executable task representations.
+
+The Command Engine is **not currently a required stage in the primary `Agent.process()` execution path**.
+
+It must not become a second execution engine or bypass Runtime.
+
+Its role may expand in a future architectural change, but such a change must be explicitly designed, implemented, tested, and documented before being treated as current architecture.
+
+---
+
+### Logger
+
+The Logger provides application-level logging infrastructure.
+
+Responsibilities:
+
+* Record operational events.
+* Support debugging and observability.
+* Provide structured logging facilities to core components.
+
+Runtime log files are operational data and are not part of the source architecture.
+
+---
+
+## 3. Architectural Boundaries
+
+AXIS maintains the following ownership boundaries:
+
+| Component      | Primary Responsibility                    |
+| -------------- | ----------------------------------------- |
+| Agent          | Application coordination                  |
+| Intent Engine  | Intent resolution                         |
+| Planner        | Plan creation                             |
+| Executor       | Plan traversal and execution coordination |
+| Runtime        | Central execution boundary                |
+| Plugin Manager | Plugin registration and resolution        |
+| Plugins        | Capability-specific behavior              |
+| Memory         | Persistence and retrieval                 |
+| Command Engine | Task/command conversion                   |
+| Logger         | Operational logging                       |
+
+The following rules are mandatory:
+
+1. Runtime owns capability execution.
+2. Planner owns plan creation.
+3. Executor owns plan traversal.
+4. Memory owns persistence.
+5. Plugins expose capabilities.
+6. Agent owns application-level coordination.
+7. Components must not create duplicate execution systems.
+8. Plugin-specific behavior must remain outside orchestration components.
+9. Future architecture must not be described as implemented.
+10. Existing interfaces must remain backward compatible unless an approved architecture change explicitly replaces them.
+
+---
+
+## 4. Execution Lifecycle
+
+A normal AXIS request currently follows this conceptual lifecycle:
+
+1. The user provides a request.
+2. The Agent receives the request.
+3. The Intent Engine resolves the request into structured intent.
+4. The Planner converts the intent into an `ExecutionPlan`.
+5. The Executor traverses the plan.
+6. Runtime coordinates execution of required capabilities.
+7. Runtime uses the Plugin Manager to resolve appropriate plugins.
+8. Plugins perform their isolated capability-specific operations.
+9. Results return through Runtime and the Executor.
+10. The Agent records relevant results through Runtime and produces the response.
+
+Memory may participate in the lifecycle through Runtime when persistent context or historical information is required.
+
+---
+
+## 5. Current Repository Architecture
+
+The current implementation is organized around the following primary components:
+
+```text
+agent/
+    Agent coordination
+
+kernel/
+    Intent Engine
+    Runtime
+    Memory
+    Plugin Manager
+    Command Engine
+
+planner/
+    ExecutionPlan
+    Step
+    Planner interfaces
+    Planner implementation
+
+execution/
+    Executor
+    ExecutionResult
+
+core/
+    Logging infrastructure
+
+tests/
+    Automated verification
 ```
 
-Detailed request lifecycle:
-
-1. User submits a request through an Interface (CLI, REST, SDK, UI). The Interface authenticates the caller and validates the input.
-2. The Interface issues a request to the Kernel to treat the input as a Goal. The Kernel creates an agent context and consults policy configuration.
-3. The Kernel invokes the Planning Engine to decompose the goal into a task graph. The Reasoning Engine may be consulted to validate constraints or propose subgoals.
-4. The Kernel Scheduler takes the task graph and enqueues tasks. Tasks are annotated with required capabilities and resource constraints.
-5. Workers pick up tasks matching capabilities from the Registry/Task Queue. A Worker uses the Resolver to obtain concrete endpoints and credentials.
-6. Workers interact with Memory for context and persistent data. When external actions are needed, Workers call Connectors.
-7. Tool Execution is performed in the Worker environment; the Activity is traced and emitted to the Event Bus.
-8. Execution results and provenance are stored in Memory and relevant events emitted to Observability systems.
-9. The Kernel aggregates task outcomes, applies any final reasoning or verification, and produces a response object.
-10. The Interface returns the response to the user and stores decision records for auditability.
+The exact repository structure may evolve, but architectural ownership must remain consistent with the boundaries defined in this document and `docs/ARCHITECTURE_MAP.md`.
 
 ---
 
-## Component Integration and Extensibility
+## 6. Current Capabilities
 
-All components expose versioned interfaces and clear contracts. The Registry and Event Bus are the primary extension points to add new Connectors, Workers, and reasoning modules. Modules must provide metadata, health checks, and compatibility declarations.
+The current AXIS implementation includes:
+
+* Agent coordination.
+* Intent resolution.
+* Execution planning.
+* Execution-plan traversal.
+* Runtime execution boundaries.
+* Plugin management.
+* Plugin architecture.
+* Persistent memory.
+* Memory recovery behavior.
+* Runtime persistence.
+* Command/task conversion infrastructure.
+* Logging infrastructure.
+* Automated tests.
+
+The current implementation should be treated as the authoritative source for capability availability.
 
 ---
 
-## Operational Considerations
+## 7. Future Architecture
 
-- Observability: Instrument all kernel and worker operations to generate metrics, logs, and traces.
-- Security: Enforce least privilege and isolate execution paths for tools and connectors.
-- Backups & Durability: Ensure memory backends have backups and documented restore procedures.
-- Upgrades: Support rolling upgrades with version compatibility checks in the Registry.
+AXIS is intended to grow beyond its current implementation.
+
+Potential future capabilities may include:
+
+* Local and remote LLM provider integration.
+* Ollama integration.
+* Intelligent model selection between local and external models.
+* Voice interaction.
+* Desktop and operating-system automation.
+* Expanded tool and connector capabilities.
+* More advanced memory and retrieval systems.
+* Multi-agent coordination.
+* Sandboxed capability execution.
+* Advanced observability and auditing.
+* Distributed execution.
+
+These capabilities are **future architecture unless their implementation exists in the repository and has been verified by tests or explicit integration validation**.
+
+Future concepts must never be presented as current implementation.
 
 ---
 
-For detailed component-level APIs and message schemas, consult the `interfaces/` and `kernel/` subdirectories and the code-level documentation.
+## 8. Architectural Change Policy
+
+Before changing an architectural boundary:
+
+1. Inspect the current implementation.
+2. Inspect affected tests.
+3. Identify affected documentation and AI instructions.
+4. Define the intended architectural decision.
+5. Implement the smallest coherent change.
+6. Add or update tests.
+7. Run the affected test suite.
+8. Synchronize canonical documentation.
+9. Review the resulting diff.
+10. Commit only after the implementation and documentation agree.
+
+Architecture changes must not be introduced indirectly through refactoring or feature work.
+
+---
+
+## 9. Canonical Documentation
+
+The documentation hierarchy is:
+
+### Current-state architecture
+
+`docs/ARCHITECTURE_MAP.md`
+
+Defines the detailed execution path and current component responsibilities.
+
+### High-level architecture
+
+`docs/ARCHITECTURE.md`
+
+Defines the overall architecture and boundaries described in this document.
+
+### Binding architecture rules
+
+`standards/ARCHITECTURE_RULES.md`
+
+Defines mandatory architectural ownership and development constraints.
+
+### Architecture decisions
+
+`docs/DECISIONS.md`
+
+Records historical and approved architectural decisions.
+
+### AI development instructions
+
+`AGENTS.md`, `.github/prompts/`, and `docs/AI_WORKFLOW.md`
+
+Define how AI development tools must operate within the canonical architecture.
+
+These documents must remain consistent with the implementation. When documentation conflicts with verified code and tests, the conflict must be resolved before further architectural development.
+
+---
+
+## 10. Source of Truth
+
+The hierarchy of truth is:
+
+```text
+Verified implementation + tests
+            ↓
+docs/ARCHITECTURE_MAP.md
+            ↓
+standards/ARCHITECTURE_RULES.md
+            ↓
+docs/ARCHITECTURE.md
+            ↓
+AI instructions and project documentation
+```
+
+Documentation exists to describe the system, not to override it.
+
+AXIS development must preserve this relationship.

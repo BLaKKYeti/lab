@@ -1,160 +1,286 @@
-# LAB AI OS - AI Development Workflow
+AXIS - AI Development Workflow
+Status
 
-## Purpose
+Binding development workflow for AI-assisted AXIS development.
 
-Define how AI agents collaborate during LAB AI OS development.
+This document defines how AI tools participate in AXIS development without overriding the project's canonical architecture, tests, or human ownership.
 
-The goal is controlled acceleration:
-- AI assists development
-- Human approves decisions
-- Git records history
+AI tools accelerate implementation and analysis. They do not independently redefine AXIS architecture.
 
----
+Development Principles
 
-# Agent Responsibilities
+AXIS development follows these principles:
 
-## ChatGPT - Chief Architect
+Architecture is explicit.
+Current implementation is verified against code and tests.
+Documentation must reflect the verified implementation.
+AI-generated changes must be reviewed.
+Changes should be small and coherent.
+Existing interfaces should be preserved unless an architectural change is intentional and approved.
+Tests are part of the implementation contract.
+Git history provides the record of accepted changes.
+Future capabilities must not be represented as implemented capabilities.
+Authority
+Human Project Owner
 
-Responsibilities:
+The human project owner has final authority over:
 
-- System architecture
-- Feature planning
-- Design decisions
-- Debugging strategy
-- Long-term roadmap
+Product direction
+Architectural changes
+Feature priorities
+Acceptance of implementation work
+Merge and release decisions
 
-Rules:
+AI tools provide analysis, implementation, review, and recommendations.
 
-- Do not blindly rewrite working files
-- Prefer small controlled changes
-- Explain tradeoffs before major decisions
+They do not have independent authority to redefine the project.
 
----
+AI Responsibilities
 
-## GitHub Copilot - Implementation Engineer
+Different AI tools may be used for different tasks.
 
-Responsibilities:
+Tool assignments are operational preferences, not architectural rules.
 
-- Write code
-- Refactor existing modules
-- Create boilerplate
-- Fix implementation issues
+Architecture and Planning
 
-Rules:
+AI may assist with:
 
-- Follow AI Constitution
-- Preserve plugin compatibility
-- Do not redesign architecture
-- Do not bypass Runtime
+architecture analysis
+repository archaeology
+feature decomposition
+implementation planning
+dependency analysis
+documentation analysis
+identifying architectural conflicts
 
----
+Architectural recommendations must be checked against:
 
-## Claude - Review Engineer
+Current code
+Existing tests
+docs/ARCHITECTURE_MAP.md
+standards/ARCHITECTURE_RULES.md
+Accepted architectural decisions
+Implementation
 
-Responsibilities:
+AI coding tools may assist with:
 
-- Review large changes
-- Analyze documentation
-- Find architectural problems
-- Suggest improvements
+writing new code
+modifying existing code
+refactoring
+adding tests
+fixing implementation defects
+updating documentation
 
-Rules:
+Implementation tools must not silently redesign architectural boundaries.
 
-- Review before approval
-- Do not directly change architecture
-- Do not override existing decisions
+Review
 
----
-## Cursor - Repository Implementation Engineer
+AI tools may review:
 
-Responsibilities:
+correctness
+architecture
+compatibility
+security
+maintainability
+tests
+documentation consistency
 
-- code navigation
-- implementation
-- testing
-- refactoring
+Review findings must be treated as recommendations until verified against the repository.
 
-Rules:
-- follow architecture
-- do not redesign systems
-- defer architecture conflicts
+Canonical Architecture Authority
 
-## Human Owner
+AI tools must use the following hierarchy when reasoning about the current architecture:
 
-Responsibilities:
+Verified source code and tests
+docs/ARCHITECTURE_MAP.md
+standards/ARCHITECTURE_RULES.md
+Accepted architectural decisions in docs/DECISIONS.md
+Other project documentation
+Future vision and proposals
 
-- Final approval
-- Testing
-- Product direction
-- Merge decisions
+When documents disagree, the conflict must be investigated rather than resolved by guessing.
 
----
+Future architecture must never be treated as current implementation merely because it appears in an older document.
 
-# Development Cycle
+Required Development Cycle
 
-Every feature follows:
+Every meaningful implementation change should follow this cycle.
 
-## 1. Design
+1. Inspect
 
-Question:
+Before changing code:
 
-"What problem are we solving?"
+inspect the relevant implementation
+inspect related tests
+inspect relevant documentation
+identify existing interfaces
+identify architectural boundaries
 
-Output:
+Do not begin by rewriting files based only on assumptions.
 
-- Architecture decision
-- Required files
-- Expected behavior
+2. Plan
 
----
+Define:
 
-## 2. Implementation
+the problem being solved
+the affected component
+the expected behavior
+the files that should change
+the tests required
+any architectural implications
 
-Copilot writes code.
+If the change crosses an architectural boundary, stop and explicitly review that boundary before implementation.
 
-Requirements:
+3. Implement
 
-- Type hints
-- Documentation
-- Tests
-- Modular design
+Make the smallest coherent implementation that satisfies the requirement.
 
----
+Prefer:
 
-## 3. Review
+existing interfaces
+existing abstractions
+incremental changes
+backward-compatible behavior
 
-Claude or ChatGPT reviews:
+Avoid:
 
-- Architecture
-- Security
-- Compatibility
-- Maintainability
+duplicate execution systems
+unnecessary rewrites
+speculative infrastructure
+undocumented architectural changes
+4. Test
 
----
+Run the relevant tests after implementation.
 
-## 4. Testing
+The baseline project test command is:
 
-Run:
+python -m pytest -q --basetemp="$env:TEMP\axis-pytest-temp"
 
-- pytest
-- Ruff
-- Manual verification
+A change is not considered verified until the relevant tests pass.
 
----
+Additional checks such as Ruff or manual verification should be performed when applicable.
 
-## 5. Commit
+5. Review
 
-Commit must explain:
+Review the resulting changes for:
 
-- What changed
-- Why it changed
+correctness
+architecture
+compatibility
+security
+maintainability
+unnecessary complexity
+documentation accuracy
+6. Synchronize Documentation
 
----
+If implementation changes affect architecture, responsibilities, interfaces, or behavior:
 
-# Golden Rule
+update the relevant canonical documentation
+remove stale claims
+ensure AI-facing instructions remain consistent
+ensure future architecture is clearly separated from current implementation
+7. Inspect the Diff
 
-AI creates speed.
+Before committing:
 
-Architecture creates survival.
+git diff
+git status
 
-Every change must improve the system, not just add features.
+Confirm that:
+
+only intended files changed
+no generated artifacts were accidentally included
+no runtime data was committed
+no unrelated refactoring occurred
+documentation matches the implementation
+8. Commit
+
+Commit only after implementation, testing, review, and documentation synchronization are complete.
+
+Commit messages should clearly describe the accepted change.
+
+Architectural Safety Rules
+
+AI-assisted development must preserve the following current-state boundaries:
+
+Runtime owns execution.
+Planner owns plan creation.
+Executor owns plan traversal.
+Memory owns persistence.
+Agent owns application-level coordination.
+Intent Engine owns intent resolution.
+Command Engine owns command/task conversion.
+Plugin Manager owns plugin registration and resolution.
+Plugins own capability-specific behavior.
+
+AI tools must not:
+
+bypass Runtime for capability execution
+create duplicate execution engines
+put plugin-specific behavior into orchestration components
+silently change component ownership
+represent planned systems as implemented
+remove compatibility without an intentional architectural decision
+
+The binding architectural rules are defined in:
+
+standards/ARCHITECTURE_RULES.md
+
+Documentation Rules
+
+Documentation is part of the system's engineering state.
+
+When changing documentation:
+
+Determine whether the document describes current state, architecture, standards, decisions, requirements, or future vision.
+Compare its claims against the implementation.
+Remove stale implementation claims.
+Preserve valid future goals as explicitly future.
+Keep terminology consistent with the canonical architecture.
+Do not create duplicate sources of truth unnecessarily.
+
+The goal is a repository where an AI agent can inspect the documentation and arrive at the same architectural understanding as a human developer inspecting the code.
+
+Git Discipline
+
+AI tools should never assume that a clean-looking change is safe to commit.
+
+Before committing:
+
+git status
+git diff
+
+After committing:
+
+git status
+git log --oneline --decorate -5
+
+Branches, commits, tags, and working-tree state must be treated as part of the project's development record.
+
+Recovery and Continuity
+
+AXIS development may involve work performed across different AI tools or development sessions.
+
+To preserve continuity:
+
+important architectural decisions must be documented
+implementation state must be recoverable from Git
+tests must establish known-good checkpoints
+documentation must distinguish current state from future intent
+AI tools must inspect the repository before assuming historical context
+
+No AI tool should assume that a previous implementation or architectural claim is correct without verification.
+
+Golden Rule
+
+AI creates development speed.
+
+Architecture creates system stability.
+
+Tests create confidence.
+
+Git creates history.
+
+Documentation preserves continuity.
+
+Every change should make AXIS more understandable, more reliable, or more capable without sacrificing the boundaries that make future development possible.
