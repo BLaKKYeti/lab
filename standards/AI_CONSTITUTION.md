@@ -1,197 +1,125 @@
-# LAB AI OS – AI Constitution
+# AXIS — AI Constitution
 
 ## Mission
 
-Build a modular intelligent operating system capable of understanding, planning, and executing tasks through independent systems and plugins.
+Build a modular personal AI operating system capable of understanding requests, planning actions, and executing capabilities through independent systems and plugins while remaining reliable, auditable, and extensible.
 
----
+The current repository is a tested Python foundation. Future capabilities must not be described as implemented until code and tests support them.
 
-# Core Principles
+## Core Principles
 
 1. Never sacrifice architecture for speed.
-
 2. Every feature must be modular.
-
 3. Every module must have one clear responsibility.
-
-4. Runtime controls execution flow.
-
-5. Plugins must remain independent.
-
+4. Runtime controls capability execution.
+5. Plugins remain independent.
 6. Plugins communicate through approved system layers.
-
-7. Preserve backwards compatibility.
-
+7. Preserve backward compatibility unless an approved change replaces an interface.
 8. Avoid duplicated functionality.
+9. Prefer composition over unnecessary inheritance.
+10. Keep subsystems replaceable where practical.
+11. Keep documentation synchronized with implementation.
 
-9. Prefer composition over inheritance.
-
-10. Every subsystem should be replaceable.
-
----
-
-# Architecture Rules
-
-The official execution pipeline:
+## Canonical Current Execution Flow
 
 User
-
 ↓
-
+Agent
+↓
 Intent Engine
-
 ↓
-
-Command Engine
-
-↓
-
 Planner
-
 ↓
-
+Executor
+↓
 Runtime
-
 ↓
-
 Plugin Manager
-
 ↓
-
 Plugin
-
 ↓
+Result / Response
 
-Response
+Memory is accessed through Runtime. Command Engine is implemented and tested as a supporting plan-to-task conversion subsystem, but is not currently part of the primary `Agent.process()` path.
 
+## Boundary Rules
 
-Never bypass Runtime.
+- Runtime owns capability execution.
+- Planner owns plan creation.
+- Executor owns plan traversal.
+- Memory owns persistence and retrieval.
+- Plugin Manager owns plugin registration and resolution.
+- Plugins expose isolated capabilities.
+- Agent owns application-level coordination.
+- Never bypass Runtime.
+- Never allow direct plugin-to-plugin communication.
+- Never create a duplicate execution path.
+- Never put plugin-specific business logic into orchestration components.
+- Never document future architecture as current implementation.
 
-Never allow direct plugin-to-plugin communication.
-
-Never place business logic inside Runtime.
-
----
-
-# Engineering Standards
+## Engineering Standards
 
 Always:
 
-- Use Python type hints.
-- Keep functions focused.
-- Document public methods.
-- Use clear naming.
-- Write testable code.
-- Keep modules loosely coupled.
-- Prefer readable solutions.
+- use Python type hints where appropriate
+- keep functions focused
+- document public behavior where useful
+- use clear naming
+- write testable code
+- keep modules loosely coupled
+- prefer readable, maintainable solutions
 
 Avoid:
 
-- Global state.
-- Circular imports.
-- Hardcoded plugin names.
-- Duplicate systems.
-- Hidden dependencies.
-- Breaking existing interfaces.
+- global state without a clear reason
+- circular imports
+- hardcoded plugin names
+- duplicate systems
+- hidden dependencies
+- breaking existing interfaces without approval
 
----
+## AI Agent Responsibilities
 
-# AI Agent Responsibilities
+### Architecture Authority
 
-## ChatGPT
+The human owner approves architectural direction. AI assistants may analyze, propose, implement approved changes, and identify conflicts, but must not silently change architectural boundaries.
 
-Role:
-Chief Architect
+### Implementation Assistants
 
-Responsibilities:
+AI coding tools should:
 
-- Architecture decisions.
-- System planning.
-- Debugging strategy.
-- Long-term direction.
+- inspect before editing
+- follow the canonical references
+- make the smallest coherent change
+- add or update tests
+- report architecture impact
+- report test results accurately
 
-Restrictions:
+### Review Assistants
 
-- Do not rewrite working systems without approval.
-- Do not make unnecessary architectural changes.
+Review-oriented AI tools should identify architectural, security, compatibility, maintainability, and documentation risks without treating proposed future systems as current implementation.
 
+## Definition of Done
 
-## GitHub Copilot
-
-Role:
-Implementation Engineer
-
-Responsibilities:
-
-- Write code.
-- Refactor.
-- Generate tests.
-- Complete repetitive tasks.
-
-Restrictions:
-
-- Do not redesign architecture.
-- Follow existing specifications.
-
-
-## Claude
-
-Role:
-Review Engineer
-
-Responsibilities:
-
-- Analyze large changes.
-- Review documentation.
-- Identify risks.
-
-Restrictions:
-
-- Do not override architecture decisions.
-
-
-## Human Owner
-
-Role:
-Product Owner
-
-Responsibilities:
-
-- Final approval.
-- Testing.
-- Direction.
-- Feature priorities.
-
----
-
-# Definition of Done
-
-A feature is complete when:
+A feature is complete when it is:
 
 ✓ Implemented
 
 ✓ Tested
 
-✓ Documented
+✓ Documented when behavior or architecture requires it
 
-✓ Compatible
+✓ Compatible or explicitly approved as breaking
 
 ✓ Reviewed
 
 ✓ Committed
 
----
-
-# Decision Priority
+## Decision Priority
 
 1. Architecture
-
 2. Reliability
-
 3. Maintainability
-
 4. Security
-
 5. Performance
-
 6. Convenience
