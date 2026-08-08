@@ -16,12 +16,14 @@ class Planner(PlannerInterface):
             for step in steps:
                 plugin = step.get("plugin")
                 action = step.get("action")
+                input_data = step.get("input")
 
                 if plugin and action:
                     plan.add_step(
                         Step(
                             plugin=plugin,
                             action=action,
+                            input=input_data,
                         )
                     )
 
@@ -29,12 +31,14 @@ class Planner(PlannerInterface):
 
         plugin = intent.get("plugin")
         action = intent.get("action")
+        input_data = intent.get("input")
 
         if plugin and action:
             plan.add_step(
                 Step(
                     plugin=plugin,
                     action=action,
+                    input=input_data,
                 )
             )
 
