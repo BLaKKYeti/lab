@@ -85,7 +85,7 @@ def test_executor_executes_multiple_steps_in_order():
                     {
                         "plugin": "filesystem",
                         "action": "list_pdfs",
-                        "input": None,
+                        "input": {"path": "C:\\Users"},
                     },
                 )(),
                 type(
@@ -94,7 +94,7 @@ def test_executor_executes_multiple_steps_in_order():
                     {
                         "plugin": "time",
                         "action": "current_time",
-                        "input": None,
+                        "input": {"timezone": "Jamaica"},
                     },
                 )(),
             ]
@@ -135,9 +135,9 @@ def test_executor_passes_task_to_runtime():
                     "Step",
                     (),
                     {
-                        "plugin": "filesystem",
-                        "action": "list_pdfs",
-                        "input": {"path": "C:\\Users"},
+                        "plugin": "time",
+                        "action": "current_time",
+                        "input": {"timezone": "Jamaica"},
                     },
                 )()
             ]
@@ -148,6 +148,6 @@ def test_executor_passes_task_to_runtime():
 
     assert len(results) == 1
     assert isinstance(runtime.received, Task)
-    assert runtime.received.plugin == "filesystem"
-    assert runtime.received.action == "list_pdfs"
-    assert runtime.received.input == {"path": "C:\\Users"}
+    assert runtime.received.plugin == "time"
+    assert runtime.received.action == "current_time"
+    assert runtime.received.input == {"timezone": "Jamaica"}
