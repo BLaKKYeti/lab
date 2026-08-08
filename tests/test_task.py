@@ -24,3 +24,14 @@ def test_task_can_represent_planned_work():
 
     assert task.plugin == "filesystem"
     assert task.action == "list_pdfs"
+
+
+def test_task_can_carry_input():
+    task = Task(
+        intent="planned",
+        plugin="filesystem",
+        action="list_pdfs",
+        input={"path": "C:\\Users"},
+    )
+
+    assert task.input == {"path": "C:\\Users"}
