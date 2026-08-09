@@ -11,16 +11,23 @@ from response.builder import ResponseBuilder
 class Agent:
     def __init__(self):
         self.runtime = Runtime()
-        self.intent_engine = IntentEngine()
+
         self.planner = Planner()
-        self.command_engine = CommandEngine()
 
         self.executor = Executor(self.runtime)
+
         self.response_builder = ResponseBuilder()
 
         self.execution_context = None
 
         self.capability_query = None
+
+        self.intent_engine = IntentEngine()
+
+        self.command_engine = CommandEngine(
+            runtime=self.runtime,
+            intent_engine=self.intent_engine,
+        )
 
     def start(self):
         self.runtime.start()
@@ -30,6 +37,8 @@ class Agent:
         registry = discovery.discover()
 
         self.capability_query = CapabilityQuery(registry)
+
+        self.intent_engine.capability_registry = registry
 
     def process(self, user_input):
         intent = self.intent_engine.resolve(user_input)

@@ -16,3 +16,25 @@ def test_command_engine_converts_plan_to_tasks():
     assert len(tasks) == 1
     assert tasks[0].plugin == "time"
     assert tasks[0].action == "current_time"
+
+
+def test_command_engine_preserves_step_input():
+
+    engine = CommandEngine()
+
+    plan = ExecutionPlan()
+
+    plan.add_step(
+        Step(
+            plugin="filesystem",
+            action="list_pdfs",
+            input={"path": "C:\\Users"},
+        )
+    )
+
+    tasks = engine.execute_plan(plan)
+
+    assert len(tasks) == 1
+    assert tasks[0].plugin == "filesystem"
+    assert tasks[0].action == "list_pdfs"
+    assert tasks[0].input == {"path": "C:\\Users"}

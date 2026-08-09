@@ -89,3 +89,11 @@ def test_agent_process_exposes_stopped_execution_context():
     assert len(agent.execution_context.results) == 1
     assert len(agent.execution_context.evaluations) == 1
     assert len(agent.execution_context.decisions) == 1
+
+
+def test_agent_uses_discovered_capability_registry():
+    agent = Agent()
+
+    agent.start()
+
+    assert agent.intent_engine.capability_registry is agent.capability_query.registry
