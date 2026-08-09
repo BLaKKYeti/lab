@@ -56,3 +56,36 @@ def test_agent_context_contains_execution_feedback():
 
     assert context.evaluations[0].status == "success"
     assert context.decisions[0].action == "continue"
+
+
+def test_agent_process_exposes_execution_context():
+    agent = Agent()
+
+    agent.start()
+    agent.process("what time is it")
+
+    assert agent.execution_context is not None
+    assert agent.execution_context.status == "completed"
+    assert len(agent.execution_context.results) == 1
+    assert len(agent.execution_context.evaluations) == 1
+    assert len(agent.execution_context.decisions) == 1
+
+
+def test_agent_process_exposes_stopped_execution_context():
+    agent = Agent()
+
+    agent.start()
+
+    agent.executor.runtime = type(
+        "FailingRuntime",
+        (),
+        {"execute": lambda self, task: "Plugin 'time' not found"},
+    )()
+
+    agent.process("what time is it")
+
+    assert agent.execution_context is not None
+    assert agent.execution_context.status == "stopped"
+    assert len(agent.execution_context.results) == 1
+    assert len(agent.execution_context.evaluations) == 1
+    assert len(agent.execution_context.decisions) == 1
