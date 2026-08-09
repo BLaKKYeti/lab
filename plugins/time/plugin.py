@@ -23,7 +23,6 @@ class TimePlugin(Plugin):
         self.config = config
 
     def execute(self, task, input=None):
-
         if task == "current_time":
             return datetime.now().strftime("%H:%M:%S")
 

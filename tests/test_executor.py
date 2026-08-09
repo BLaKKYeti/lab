@@ -151,3 +151,194 @@ def test_executor_passes_task_to_runtime():
     assert runtime.received.plugin == "time"
     assert runtime.received.action == "current_time"
     assert runtime.received.input == {"timezone": "Jamaica"}
+
+
+def test_executor_creates_execution_context():
+    runtime = FakeRuntime("12:34")
+    executor = Executor(runtime)
+
+    plan = type(
+        "Plan",
+        (),
+        {
+            "steps": [
+                type(
+                    "Step",
+                    (),
+                    {
+                        "plugin": "time",
+                        "action": "current_time",
+                        "input": None,
+                    },
+                )()
+            ]
+        },
+    )()
+
+    executor.execute_plan(plan)
+
+    assert executor.context is not None
+    assert executor.context.status == "completed"
+
+
+def test_executor_context_records_successful_execution():
+    runtime = FakeRuntime("12:34")
+    executor = Executor(runtime)
+
+    plan = type(
+        "Plan",
+        (),
+        {
+            "steps": [
+                type(
+                    "Step",
+                    (),
+                    {
+                        "plugin": "time",
+                        "action": "current_time",
+                        "input": None,
+                    },
+                )()
+            ]
+        },
+    )()
+
+    executor.execute_plan(plan)
+
+    assert len(executor.context.results) == 1
+    assert len(executor.context.evaluations) == 1
+    assert len(executor.context.decisions) == 1
+
+    assert executor.context.decisions[0].action == "continue"
+
+
+def test_executor_context_records_failure_and_stops():
+    runtime = FakeRuntime("Plugin 'time' not found")
+    executor = Executor(runtime)
+
+    plan = type(
+        "Plan",
+        (),
+        {
+            "steps": [
+                type(
+                    "Step",
+                    (),
+                    {
+                        "plugin": "time",
+                        "action": "current_time",
+                        "input": None,
+                    },
+                )()
+            ]
+        },
+    )()
+
+    executor.execute_plan(plan)
+
+    assert executor.context.status == "stopped"
+    assert len(executor.context.results) == 1
+    assert len(executor.context.evaluations) == 1
+    assert len(executor.context.decisions) == 1
+
+    assert executor.context.evaluations[0].status == "failure"
+    assert executor.context.decisions[0].action == "stop"
+
+
+def test_executor_creates_execution_context():
+    runtime = FakeRuntime("12:34")
+    executor = Executor(runtime)
+
+    plan = type(
+        "Plan",
+        (),
+        {
+            "steps": [
+                type(
+                    "Step",
+                    (),
+                    {
+                        "plugin": "time",
+                        "action": "current_time",
+                        "input": None,
+                    },
+                )()
+            ]
+        },
+    )()
+
+    executor.execute_plan(plan)
+
+    assert executor.context is not None
+    assert executor.context.status == "completed"
+
+
+def test_executor_context_records_successful_execution():
+    runtime = FakeRuntime("12:34")
+    executor = Executor(runtime)
+
+    plan = type(
+        "Plan",
+        (),
+        {
+            "steps": [
+                type(
+                    "Step",
+                    (),
+                    {
+                        "plugin": "time",
+                        "action": "current_time",
+                        "input": None,
+                    },
+                )()
+            ]
+        },
+    )()
+
+    results = executor.execute_plan(plan)
+
+    assert len(results) == 1
+    assert len(executor.context.results) == 1
+    assert len(executor.context.evaluations) == 1
+    assert len(executor.context.decisions) == 1
+    assert executor.context.status == "completed"
+
+
+def test_executor_context_records_failure_and_stops():
+    runtime = FakeRuntime("Plugin 'time' not found")
+    executor = Executor(runtime)
+
+    plan = type(
+        "Plan",
+        (),
+        {
+            "steps": [
+                type(
+                    "Step",
+                    (),
+                    {
+                        "plugin": "time",
+                        "action": "current_time",
+                        "input": None,
+                    },
+                )(),
+                type(
+                    "Step",
+                    (),
+                    {
+                        "plugin": "filesystem",
+                        "action": "list_pdfs",
+                        "input": None,
+                    },
+                )(),
+            ]
+        },
+    )()
+
+    results = executor.execute_plan(plan)
+
+    assert len(results) == 1
+    assert executor.context.status == "stopped"
+    assert len(executor.context.results) == 1
+    assert len(executor.context.evaluations) == 1
+    assert len(executor.context.decisions) == 1
