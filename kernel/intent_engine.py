@@ -7,6 +7,20 @@ class IntentEngine:
         self.load_defaults()
 
     def load_defaults(self):
+        # Capability query intents
+        self.registry.register(
+            [
+                "what can you do",
+                "what can axis do",
+                "what are your capabilities",
+                "what can you help me with",
+                "show me what you can do",
+                "show capabilities",
+            ],
+            "capabilities",
+            "describe",
+        )
+
         # Filesystem intents
         self.registry.register(
             ["pdf", "pdfs", "document", "documents", "file", "files"],

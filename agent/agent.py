@@ -1,3 +1,5 @@
+from capabilities.discovery import CapabilityDiscovery
+from capabilities.query import CapabilityQuery
 from execution.executor import Executor
 from kernel.command_engine import CommandEngine
 from kernel.intent_engine import IntentEngine
@@ -18,11 +20,30 @@ class Agent:
 
         self.execution_context = None
 
+        self.capability_query = None
+
     def start(self):
         self.runtime.start()
 
+        discovery = CapabilityDiscovery(self.runtime.plugin_manager)
+
+        registry = discovery.discover()
+
+        self.capability_query = CapabilityQuery(registry)
+
     def process(self, user_input):
         intent = self.intent_engine.resolve(user_input)
+
+        if (
+            intent.get("plugin") == "capabilities"
+            and intent.get("action") == "describe"
+        ):
+            self.execution_context = None
+
+            if self.capability_query is None:
+                return "Capability discovery has not been initialized."
+
+            return self.capability_query.describe()
 
         plan = self.planner.create_plan(intent)
 
